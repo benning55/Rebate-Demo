@@ -1,0 +1,67 @@
+version: "3.7"
+
+services:
+  app:
+    container_name: app-poc
+    user: $UID:$GID
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app:Z
+      - ./app/static:/app/static
+      - ./app/media:/app/media
+    command: >
+      sh -c "pip install -r requirements.txt && tail -f /dev/null"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=inventory
+      - DB_USER=admininventory
+      - DB_PASS=postgres15
+      - DEBUG=True
+      - TYPE=dev
+    depends_on:
+      - db
+
+  db:
+    container_name: db-poc
+    image: postgres:11-alpine
+    ports:
+      - 5433:5432
+    #    user: 1000:1000
+    environment:
+      - POSTGRES_DB=inventory
+      - POSTGRES_USER=admininventory
+      - POSTGRES_PASSWORD=postgres15
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ./data2:/var/lib/postgresql/data
+
+  frontend:
+    container_name: frontend-poc
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/frontend:Z
+    command: >
+      sh -c "tail -f /dev/null"
+
+  nginx:
+    container_name: nginx-poc
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.dev
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./app/static:/static
+      - ./app/media:/media
+    depends_on:
+      - frontend
+      - app

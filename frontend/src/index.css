@@ -1,0 +1,187 @@
+@import "react-notifications-component/dist/theme.css";
+/* @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap"); */
+
+:root {
+  --fontColor: rgba(20, 54, 82, 255);
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+}
+
+/*@font-face {*/
+/*  font-family: "Lota Grotesque Alt 1 Regular";*/
+/*  font-style: normal;*/
+/*  font-weight: normal;*/
+/*  src: local("Lota Grotesque Alt 1 Regular"),*/
+/*    url("./Public/Font/lota-grotesque-alt-1-cufonfonts-webfont/Los\ Andes\ \ Lota\ Grotesque\ Regular.woff")*/
+/*      format("woff");*/
+/*}*/
+
+body {
+  box-sizing: border-box;
+  /*font-family: "Lota Grotesque Alt 1 Regular" !important;*/
+  /*background: transparent url("./Public/image/top2.png") 0% 0% no-repeat*/
+  /*  padding-box;*/
+  overflow-y: scroll;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+  /* WebKit */
+  width: 0;
+  height: 0;
+}
+
+a {
+  text-decoration: none !important;
+  color: white !important;
+}
+
+@media (min-width: 991px) {
+  .home-mobile {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    display: flex;
+  }
+}
+
+@media (max-width: 991px) {
+  /* home */
+  .spacetop {
+    padding-top: 3rem;
+  }
+
+  .setHeight1 {
+    height: unset;
+  }
+
+  .setHeight2 {
+    padding-top: 3rem;
+    height: unset;
+  }
+  .nav-link-wrapper {
+    flex-direction: column;
+  }
+
+  .nav-link-pad {
+    padding: 0.5rem 0;
+  }
+
+  .drag-off {
+    display: none !important;
+  }
+
+  .clipboard-btn {
+    display: block;
+    padding-bottom: 1.5rem;
+  }
+
+  .loading-wrapper {
+    height: unset;
+  }
+
+  .desc-drag {
+    display: none;
+  }
+
+  /* credential result page */
+  .correct-box {
+    width: 100%;
+  }
+
+  .spaced-icon {
+    padding-left: unset;
+  }
+
+  .cred-result-wrapper {
+    justify-content: space-between;
+  }
+
+  .pad-header {
+    padding-top: 1.5rem;
+  }
+
+  .adj-contain-space {
+    padding: 3rem 1rem;
+  }
+
+  .adj-space-cert2 {
+    margin-top: 2rem;
+  }
+
+  /* QR Generator page */
+
+  .form-display-set {
+    flex-direction: column;
+  }
+
+  .form-input {
+    width: 100%;
+  }
+
+  .qr-output {
+    display: none;
+    width: 100%;
+    padding-left: unset;
+    padding-top: 5%;
+  }
+
+  .qrbtn {
+    padding: 0.7rem !important;
+    font-weight: bold !important;
+    background-color: #00477b !important;
+    border-color: #00477b !important;
+    color: #fff !important;
+    font-size: 1rem !important;
+  }
+
+  .float {
+    display: block !important;
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    animation: glow3 1s infinite alternate;
+  }
+
+  .mobile-qr {
+    display: block !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  .cert-info-tab {
+    overflow-x: scroll;
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 10px -10px hsl(203, 99%, 50%);
+  }
+  to {
+    box-shadow: 0 0 10px 10px hsl(203, 99%, 50%);
+  }
+}
+
+@keyframes glow2 {
+  from {
+    box-shadow: 0 0 5px -5px hsl(203, 99%, 50%);
+  }
+  to {
+    box-shadow: 0 0 5px 5px hsl(203, 99%, 50%);
+  }
+}
+
+@keyframes glow3 {
+  from {
+    box-shadow: 0 0 5px -5px #00477b;
+  }
+  to {
+    box-shadow: 0 0 5px 5px #00477b;
+  }
+}

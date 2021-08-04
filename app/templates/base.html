@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <link
+          href="https://fonts.googleapis.com/css?family=Lato&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://fonts.googleapis.com/css?family=Sarabun&display=swap"
+          rel="stylesheet"
+        />
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+
+        {# datatable#}
+        <link
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdn.datatables.net/v/dt/dt-1.10.20/b-1.6.1/b-html5-1.6.1/datatables.min.css"
+        />
+        <script
+          type="text/javascript"
+          src="https://cdn.datatables.net/v/dt/dt-1.10.20/b-1.6.1/b-html5-1.6.1/datatables.min.js"
+        ></script>
+        <script
+          type="text/javascript"
+          src="https://code.jquery.com/jquery-3.3.1.js"
+        ></script>
+        <script
+          type="text/javascript"
+          src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"
+        ></script>
+        <script
+          type="text/javascript"
+          src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"
+        ></script>
+        <link
+          rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+          crossorigin="anonymous"
+        />
+        <title>{% block page_title %}{% endblock %}</title>
+
+        {% block style_base %}
+            {% block layout_style %}
+                <style type="text/css">
+                    @page {
+                        size: {{ pagesize|default:"A4" }};
+                        margin-left: 1cm;
+                        margin-right: 1cm;
+
+                        @frame header {
+                            -pdf-frame-content: page-header;
+                            margin-top: 1.0cm;
+                            margin-left: 1cm;
+                            margin-right: 0.5cm;
+                            margin-bottom: 0.5cm;
+                            height: 3cm;
+                        }
+
+                        @frame content {
+                            top: 0.5cm;
+                            margin-top: 3.5cm;
+                            margin-bottom: 0.5cm;
+                            margin-left: 1.75cm;
+                            margin-right: 1.5cm;
+                        }
+
+                        @frame footer {
+                            -pdf-frame-content: page-footer;
+                            bottom: 0cm;
+                            margin-left: 1cm;
+                            margin-right: 1.5cm;
+                            height: 2cm;
+                        }
+                    }
+                </style>
+            {%endblock%}
+            {% block extra_style %}{% endblock %}
+        {% endblock %}
+
+    </head>
+
+    <body>
+        <div id="page-header">
+            {%block page_header%}
+            {%endblock%}
+        </div>
+
+        <div id="page-content">
+            {%block page_content%}
+            {%endblock%}
+        </div>
+
+        <div id="page-footer">
+            {%block page_foot%}
+            {%endblock%}
+        </div>
+
+    </body>
+</html>

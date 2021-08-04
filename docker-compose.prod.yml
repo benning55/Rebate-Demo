@@ -1,0 +1,81 @@
+version: "3.7"
+
+services:
+  app:
+    container_name: prod-inventory-app
+    user: $UID:$GID
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app:Z
+      - ./app/static:/app/static
+      - ./app/media:/app/media
+    command: >
+      sh -c "pip install -r requirements.txt && python manage.py collectstatic --no-input && python manage.py makemigrations && python manage.py migrate && python manage.py initdb && gunicorn app.wsgi:application --timeout 800 --bind 0.0.0.0:8000"
+    environment:
+      - DB_HOST=db
+      - DB_NAME=inventory
+      - DB_USER=admininventory
+      - DB_PASS=postgres15
+      - SECRET_KEY=3bh=u&qqo2mn&n0*8h$$@kw&k(j#$$al&jc@wr$$^%qxb_=^hgqq-
+      - EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+      - EMAIL_HOST=smtp.sendgrid.net
+      - EMAIL_HOST_USER=info@thaimarket.express
+      - EMAIL_HOST_PASSWORD=OSKOSKOSK100
+      - EMAIL_PORT=587
+      - EMAIL_USE_TLS=True
+      - DEBUG=False
+      - TYPE=dev
+    depends_on:
+      - db
+
+  db:
+    container_name: inventory-db
+    image: postgres:11-alpine
+    ports:
+      - 5433:5432
+#    user: 1000:1000
+    environment:
+      - POSTGRES_DB=inventory
+      - POSTGRES_USER=admininventory
+      - POSTGRES_PASSWORD=postgres15
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ./data2:/var/lib/postgresql/data
+
+  frontend:
+    container_name: prod-inventory-frontend
+    image: benning55/pos:latest
+    ports:
+      - "8080:8080"
+
+  nginx-ssl:
+    image: valian/docker-nginx-auto-ssl
+    container_name: prod-nginx-inventory
+    restart: on-failure
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ssl_data:/etc/resty-auto-ssl
+    environment:
+      ALLOWED_DOMAINS: 'pos.benning.studio'
+      SITES: 'pos.benning.studio=nginx:80'
+
+  nginx:
+    container_name: prod-inventory-nginx
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    volumes:
+      - ./app/static:/static
+      - ./app/media:/media
+    depends_on:
+      - frontend
+      - app
+
+volumes:
+  ssl_data:

@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+      xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+      xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Sarabun&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    {#    datatable#}
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/dt/dt-1.10.20/b-1.6.1/b-html5-1.6.1/datatables.min.css"/>
+    <script type="text/javascript"
+            src="https://cdn.datatables.net/v/dt/dt-1.10.20/b-1.6.1/b-html5-1.6.1/datatables.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+    <style>
+        @page {
+            size: A4 portrait;
+            page-break-after: always;
+            {#margin: 1cm;#}
+            {#margin-top: 14cm;#}
+            {#margin-bottom: 1cm;#}
+            @top-left{
+                content: element(header);
+            }
+        }
+
+        {#header {#}
+        {#  position: fixed;#}
+        {#  top: 0;#}
+        {#  margin-top: -12.6cm;#}
+        {#  width: 100%;#}
+        {#}#}
+
+        @media print {
+            @font-face {
+                font-family: 'Verdana';
+                src: url("/resources/fonts/THSarabunNew Italic.ttf");
+            }
+
+            body {
+                font-family: 'Verdana' !important;
+                font-size: 16px !important;
+            }
+
+            table,
+            th,
+            td {
+              border: 1px solid black;
+              border-collapse: collapse;
+            }
+            thead,
+            tbody {
+               border: 1px solid black;
+            }
+            th,
+            td {
+              padding: 5px;
+              text-align: left;
+            }
+
+        }
+    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Order Receipt</title>
+</head>
+<body>
+
+{#<div style="padding-bottom: 189px;"></div>#}
+{% load humanize %}
+<header class="container">
+  <div class="row" style="justify-content: space-between">
+    <div class="col-8">
+      <div class="row">
+        <div class="col-5"><img style="width: 90%" src="https://www.psv-sand.com/wp-content/uploads/2021/03/110850.png" alt=""></div>
+        <div class="col-8" style="padding-left: 0.5rem">
+          <b>บริษัท พีเอสวี กรุ๊ป จำกัด</b>
+          <p>
+            70/2 หมู่ 5 ถ.เลียบคลองรังสิต ตำบล บ้านใหม่ อำเภอเมืองปทุมธานี
+            จังหวัดปทุมธานี
+          </p>
+          <p>Tel. 02-00111181-3 Fax.02-0011180</p>
+        </div>
+      </div>
+    </div>
+    <div
+      class="col-4"
+      style="
+        width: 100%;
+        height: 100px;
+        border: 1px solid red;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <div>
+        <p style="text-align: center">ใบกำกับภาษี</p>
+        <p style="text-align: center">TAX INVOICE</p>
+      </div>
+    </div>
+  </div>
+  <div class="row" style="justify-content: space-between">
+    <div class="col-8"></div>
+    <div class="col-4">
+      <p class="m-0">เลขที่ (No) {{ tax_id }}</p>
+      <p class="mt-0">วันที่ (Date) {{ date }}</p>
+    </div>
+  </div>
+  <div class="row" style="justify-content: space-between">
+    <div class="col-8">
+      <p>
+        เลขประจำตัวผู้เสียภาษี (Tax ID): 0 10 5553 11473 9 สำนักงานใหญ่
+        (เอกสารออกเป็นชุด)
+      </p>
+    </div>
+    <div
+      class="col-4"
+      style="
+        width: 100%;
+        height: 50px;
+        border: 1px solid red;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      ต้นฉบับ
+    </div>
+  </div>
+  <div
+    class="row mt-3"
+    style="border: 1px solid black; justify-content: space-between"
+  >
+    <div class="col-8">
+      <div
+        style="width: 100%; display: flex; justify-content: space-between"
+      >
+        <div>
+          ชื่อลูกค้า: {{ order.customer.name }} <br />
+            {% if 'กรุงเทพ' in tax_address.province %}
+                {{ tax_address.address }} แขวง {{ tax_address.district }} เขต {{ tax_address.county }} จังหวัด {{ tax_address.province }} {{ tax_address.code }}
+            {% else %}
+                {{ tax_address.address }} ตำบล {{ tax_address.district }} อำเภอ {{ tax_address.county }} จังหวัด {{ tax_address.province }} {{ tax_address.code }}
+            {% endif %}
+        </div>
+        <div>
+          เลขประจำตัวผู้เสียภาษี <br />
+          {% if order.customer.tax_number is None %}
+            -
+          {% else %}
+            {{ order.customer.tax_number }}
+          {% endif %}
+        </div>
+      </div>
+      <div
+        style="width: 100%; display: flex; justify-content: space-between"
+      >
+        <div>Tel. {{ order.customer.tel }}</div>
+      </div>
+    </div>
+    <div class="col-4" style="border-left: 1px solid black">
+      <div style="width: 100%">
+        <div>สถานที่ส่ง: {{ order.customer_address }}</div>
+        <div>ติดต่อ/Contact: {{ order.customer.tel }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <table class="col-12 p-0" style="width: 100%">
+      <tr>
+        <th>เลขใบสั่งซื้อ</th>
+        <th>อ้างอิง</th>
+        <th>พนักงานขาย</th>
+        <th>เครดิต</th>
+        <th>วันครบกำหนด</th>
+      </tr>
+      <tr>
+        <td>{{ order_number }}</td>
+        {% if order.client_refer is None %}
+            <td>-</td>
+        {% else %}
+            <td>{{ order.client_refer }}</td>
+        {% endif %}
+        {% if order.seller is None %}
+            <td>-</td>
+        {% else %}
+            <td>{{ order.seller.first_name }} {{ order.seller.last_name }}</td>
+        {% endif %}
+          {% if order.payment_method == 'ชำระภายหลัง' %}
+              <td>{{ order.customer.credit|intcomma  }}</td>
+              <td>{{ order.due_date }}</td>
+          {% else %}
+              <td>-</td>
+              <td>-</td>
+          {% endif %}
+      </tr>
+    </table>
+  </div>
+</header>
+
+<div class="mt-4">
+    <table style="width: 100%">
+        <thead>
+        <tr>
+            <th>ลำดับ</th>
+            <th>รหัสสินค้า</th>
+            <th>รายการ</th>
+            <th>จำนวน</th>
+            <th>หน่วย</th>
+            <th>ราคาต่อหน่วย</th>
+            <th>ส่วนลด</th>
+            <th>จำนวนเงิน</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for obj in order_items %}
+            <tr style="{% if forloop.counter == 26 or forloop.counter|divisibleby:20 and forloop.counter != 20 %}page-break-before: always;{% endif %}">
+                <td>{{ forloop.counter }}</td>
+                {% if obj.product.id is None %}
+                    <td>-</td>
+                {% else %}
+                    <td>{{ obj.product.id_display }}</td>
+                {% endif %}
+                <td style="padding-left: 35px !important;">{{ obj.name }}</td>
+                <td>{{ obj.quantity|intcomma  }}</td>
+                <td>{{ obj.unit|intcomma  }}</td>
+                <td>{{ obj.price_per_unit|intcomma  }}</td>
+                <td>{{ obj.discount|intcomma  }}</td>
+                <td>{{ obj.total_price|intcomma  }}</td>
+            </tr>
+        {% endfor %}
+            <tr >
+                <td colspan="5" rowspan="2">หมายเหตุ/Remark: {{ order.remark }}</td>
+                <td colspan="2">รวมเงิน</td>
+                <td>{{ item_price|intcomma  }}</td>
+            </tr>
+            <tr >
+                <td colspan="2">ส่วนลด</td>
+                <td>{{ order.discount|intcomma  }}</td>
+            </tr>
+            <tr >
+                <td colspan="5" rowspan="2" style="text-align: center;">เลขบัญชี {{ pay_account }} <br>(สำหรับลูกค้าโอนเงินใช้เลขบัญชีนี้บัญชีเดียวเท่านั้น)</td>
+                <td colspan="2">ภาษีมูลค่าเพิ่ม 7%</td>
+                <td>{{ vat_price|intcomma  }}</td>
+            </tr>
+            <tr >
+                <td colspan="2">รวมทั้งสิ้น</td>
+                <td>{{ order.total_price|intcomma }}</td>
+            </tr>
+            <tr>
+                <td colspan="8">( {{ thai_price }} )</td>
+            </tr>
+            <tr>
+                <td colspan="2" style="vertical-align: text-top; height: 100px;">ได้รับสิ่งของตามรายการข้างต้นในสภาพดีและถูกต้อง</td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="height: 50px;">ผู้รับของ ......../......../........</td>
+                <td colspan="2">ผู้ส่งของ ......../......../........</td>
+                <td colspan="2">ผู้มีอำนาจลงนาม</td>
+                <td colspan="2">ผู้รับเงิน</td>
+            </tr>
+            <tr>
+                <td colspan="8" style="color: red;">โปรดตรวจสอบยอดบิลตรงกับยอดสั่งซื้อทุกครั้ง หากไม่ถูกต้อง หรือไม่ได้ใบเสร็จ โปรดแจ้ง
+                    {{ contact_tel }}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+    });
+</script>
+
+</body>
+</html>
