@@ -74,7 +74,7 @@ const Home = () => {
           console.log(data)
         }}
       >
-        SUBMIT
+        SUBMIT2
       </Button>
     </Container>
   )
