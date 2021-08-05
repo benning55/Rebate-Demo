@@ -25,6 +25,7 @@ body {
   /*font-family: "Lota Grotesque Alt 1 Regular" !important;*/
   /*background: transparent url("./Public/image/top2.png") 0% 0% no-repeat*/
   /*  padding-box;*/
+  background: #f9f9f9; /* fallback for old browsers */ /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   overflow-y: scroll;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;

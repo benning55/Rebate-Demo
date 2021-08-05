@@ -9,16 +9,12 @@ const persistConfig = {
   key: "root",
   storage,
 }
-const middleware = [thunk]
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 
 // eslint-disable-next-line
 export default () => {
-  let store = createStore(
-    persistedReducer,
-    composeWithDevTools(applyMiddleware(...middleware))
-  )
+  let store = createStore(persistedReducer, applyMiddleware(thunk))
   let persistor = persistStore(store)
   return { store, persistor }
 }

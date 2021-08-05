@@ -87,4 +87,19 @@ class UserAdmin(BaseUserAdmin):
         return f'{obj.first_name} {obj.last_name}'
 
 
+class TargetNameAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'create_date']
+    search_fields = ['name']
+    list_per_page = 10
+
+
+class TargetTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'start_date', 'end_date']
+    search_fields = ['name']
+    list_per_page = 10
+
+
+
 admin.site.register(models.User, UserAdmin)
+admin.site.register(models.TargetName, TargetNameAdmin)
+admin.site.register(models.TargetType, TargetTypeAdmin)

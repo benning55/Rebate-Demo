@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
@@ -14,10 +16,12 @@ from django.core.files.base import ContentFile
 import tempfile
 from weasyprint import HTML
 from accounts import serializers
-from core.models import User
+from core.models import User, TargetName, TargetType
 from rest_framework.views import APIView
 from django.db import transaction, DatabaseError
 
+
+TargetTimeline = namedtuple('Timeline', ('target_name', 'target_type'))
 
 @api_view(['GET', ])
 @permission_classes([IsAuthenticated, ])
@@ -51,3 +55,37 @@ def register(request, format=None):
         else:
             print(serializer.errors['email'])
         return Response({'data': 'benning'}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', ])
+@permission_classes([AllowAny, ])
+def get_target_default(request, format=None):
+    """
+    Register
+    """
+    if request.method == 'GET':
+        target_name = get_object_or_404(TargetName.objects.all(), name='Default')
+        target_type = TargetType.objects.filter(target_name_id=target_name.id).order_by('min_rate')
+        target_time_line = TargetTimeline(
+            target_name=target_name,
+            target_type=target_type
+        )
+        serializer = serializers.TargetSerializer(target_time_line)
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+# class TargetManage(APIView):
+#     """
+#     Access target model
+#     """
+#
+#     def get(self, request, *args, **kwargs):
+#         """Get all target"""
+#         pk = kwargs.get("pk")
+#         start_date = request.query_params.get('start_date', None)
+#         end_date = request.query_params.get('end_date', None)
+#         name = request.query_params.get('name', None)
+#         if name is None:
+#             return Response({'detail': 'error'}, status=status.HTTP_400_BAD_REQUEST)
+#         target_name = get_object_or_404(TargetName.objects.)
+#         if pk is None:

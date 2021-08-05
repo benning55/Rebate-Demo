@@ -1,2 +1,3 @@
-export const CREATE_VC_ENDPOINT =
-  "https://vcdemo-api.sf-alpha.finema.dev/api/v1/vc"
+const ENDPOINT = "http://localhost/api/app"
+
+export default ENDPOINT

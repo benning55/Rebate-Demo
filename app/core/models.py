@@ -88,3 +88,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     class Meta:
         verbose_name_plural = "Users"
+
+
+class TargetName(models.Model):
+    """Create sell target"""
+    name = models.CharField(max_length=255, unique=True)
+    create_date = models.DateField(default=now())
+
+
+class TargetType(models.Model):
+    """Create sell target type ex. high low middle"""
+    target_name = models.ForeignKey(TargetName, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    min_rate = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    max_rate = models.DecimalField(decimal_places=2, max_digits=20, null=True)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+    create_date = models.DateField(default=now())
