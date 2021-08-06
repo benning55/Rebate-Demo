@@ -28,20 +28,22 @@ const useStyles = makeStyles((theme) => {
     },
     drawPaper: {
       width: drawerWidth,
-      background: theme.palette.primary.main,
+      background: theme.palette.primary.light,
     },
     root: {
       display: "flex",
     },
     active: {
-      background: theme.palette.secondary.main,
+      background: theme.palette.primary.dark,
     },
     title: {
       padding: theme.spacing(3),
       textAlign: "center",
+      fontWeight: theme.typography.fontWeightBold,
     },
     appBar: {
       width: `calc(100% - ${drawerWidth}px)`,
+      backgroundColor: theme.palette.primary.dark,
     },
     toolbar: theme.mixins.toolbar,
   }
@@ -63,11 +65,21 @@ export default function Layout({ children }) {
       icon: <RedeemIcon style={{ color: "white" }} />,
       path: "/dd",
     },
+    {
+      text: "Custom Mixin",
+      icon: <ListIcon style={{ color: "white" }} />,
+      path: "/ff",
+    },
+    {
+      text: "Calculate",
+      icon: <RedeemIcon style={{ color: "white" }} />,
+      path: "/55",
+    },
   ]
   return (
     <div className={classes.root}>
       {/* app bar */}
-      <AppBar className={classes.appBar} elevation={0} color='secondary'>
+      <AppBar className={classes.appBar} elevation={0}>
         <Toolbar>
           <Typography>Today is {moment().format("LL")}</Typography>
         </Toolbar>
@@ -96,7 +108,9 @@ export default function Layout({ children }) {
               button
               key={item.text}
               onClick={() => history.push(item.path)}
-              className={location.pathname == item.path ? classes.active : null}
+              className={
+                location.pathname === item.path ? classes.active : null
+              }
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText style={{ color: "white" }}>

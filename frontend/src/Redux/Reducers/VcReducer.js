@@ -1,21 +1,15 @@
-import { SET_VC, SET_JWT } from "../Types/Type"
+import { SET_LOADING } from "../Types/Type"
 
 const initialState = {
-  data: null,
-  jwt: null,
+  isLoading: false,
 }
 
 export const vcReducers = (state = initialState, action) => {
   switch (action.type) {
-    case SET_VC:
+    case SET_LOADING:
       return {
         ...state,
-        data: action.payload,
-      }
-    case SET_JWT:
-      return {
-        ...state,
-        jwt: action.payload,
+        isLoading: action.payload,
       }
     default:
       return state

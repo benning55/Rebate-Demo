@@ -1,4 +1,4 @@
-import { SET_VC, SET_JWT } from "../Types/Type"
+import { SET_VC, SET_JWT, SET_LOADING } from "../Types/Type"
 import ENDPOINT from "../Types/Endpoints"
 import axios from "axios"
 
@@ -11,6 +11,17 @@ export const setJWT = (data) => ({
   type: SET_JWT,
   payload: data,
 })
+
+export const setLoading = (data) => ({
+  type: SET_LOADING,
+  payload: data,
+})
+
+export const isLoading = (data) => {
+  return async function (dispatch, getState) {
+    dispatch(setLoading(data))
+  }
+}
 
 export const getDefault = () => {
   return async function (dispatch, getState) {
@@ -38,4 +49,5 @@ export const editDefault = (data) => {
 export default {
   getDefault,
   editDefault,
+  isLoading,
 }
