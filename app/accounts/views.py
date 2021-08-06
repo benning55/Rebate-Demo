@@ -57,13 +57,13 @@ def register(request, format=None):
         return Response({'data': 'benning'}, status=status.HTTP_200_OK)
 
 
-@api_view(['GET', ])
-@permission_classes([AllowAny, ])
-def get_target_default(request, format=None):
+class TargetDefaultManage(APIView):
     """
-    Register
+    Manage target default
     """
-    if request.method == 'GET':
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
         target_name = get_object_or_404(TargetName.objects.all(), name='Default')
         target_type = TargetType.objects.filter(target_name_id=target_name.id).order_by('min_rate')
         target_time_line = TargetTimeline(
@@ -73,6 +73,51 @@ def get_target_default(request, format=None):
         serializer = serializers.TargetSerializer(target_time_line)
         return Response({'data': serializer.data}, status=status.HTTP_200_OK)
 
+    def post(self, request, *args, **kwargs):
+        """
+        Update or Create or Delete the default target type
+        """
+        data = request.data
+        serializer = serializers.WriteTargetSerializer(data=data)
+        if serializer.is_valid():
+            try:
+                with transaction.atomic():
+                    target_name = serializer.validated_data.get('target_name_id')
+
+                    current_ids = dict()
+                    query_target_type = TargetType.objects.filter(target_name_id=target_name.id)
+                    for query_id in query_target_type:
+                        current_ids[query_id.id] = 0
+
+                    for item in serializer.validated_data.get('target_types'):
+                        if item.get('id') is not None:
+                            target = item.get('id')
+                            target.name = item.get('name', target.name)
+                            target.min_rate = item.get('min_rate', target.min_rate)
+                            target.max_rate = item.get('max_rate', target.max_rate)
+                            target.save()
+                            # Check if there are delete item
+                            if target.id in current_ids:
+                                current_ids.pop(target.id, None)
+                        else:
+                            TargetType.objects.create(
+                                name=item.get('name'),
+                                min_rate=item.get('min_rate'),
+                                max_rate=item.get('max_rate'),
+                                target_name_id=target_name.id
+                            )
+
+                    # Delete the left one
+                    for id in current_ids:
+                        deleted_target = get_object_or_404(TargetType.objects.all(), pk=id)
+                        deleted_target.delete()
+
+                    return Response({'data': 'success'}, status=status.HTTP_200_OK)
+            except DatabaseError as e:
+                transaction.rollback()
+                return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 # class TargetManage(APIView):
 #     """

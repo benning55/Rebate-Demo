@@ -93,7 +93,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class TargetName(models.Model):
     """Create sell target"""
     name = models.CharField(max_length=255, unique=True)
-    create_date = models.DateField(default=now())
+    create_date = models.DateField(auto_now=True)
 
 
 class TargetType(models.Model):
@@ -104,4 +104,4 @@ class TargetType(models.Model):
     max_rate = models.DecimalField(decimal_places=2, max_digits=20, null=True)
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
-    create_date = models.DateField(default=now())
+    create_date = models.DateField(auto_now=True)

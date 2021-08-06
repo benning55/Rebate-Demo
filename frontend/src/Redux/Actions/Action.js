@@ -24,6 +24,18 @@ export const getDefault = () => {
   }
 }
 
+export const editDefault = (data) => {
+  return async function (dispatch, getState) {
+    try {
+      const resp = await axios.post(`${ENDPOINT}/target/default/`, data)
+      return resp
+    } catch (err) {
+      return err.response
+    }
+  }
+}
+
 export default {
   getDefault,
+  editDefault,
 }

@@ -19,13 +19,23 @@
 /*    url("./Public/Font/lota-grotesque-alt-1-cufonfonts-webfont/Los\ Andes\ \ Lota\ Grotesque\ Regular.woff")*/
 /*      format("woff");*/
 /*}*/
-
+html {
+  height: 100%;
+}
 body {
   box-sizing: border-box;
   /*font-family: "Lota Grotesque Alt 1 Regular" !important;*/
   /*background: transparent url("./Public/image/top2.png") 0% 0% no-repeat*/
   /*  padding-box;*/
-  background: #f9f9f9; /* fallback for old browsers */ /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: #f9f9f9;
+  /* background: rgb(255, 255, 255);
+  background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(129, 199, 132, 1) 100%); */
+  /* background: rgb(245, 245, 245);
+  background: linear-gradient(180deg, rgba(245, 245, 245, 1) 65%, rgba(129, 199, 132, 1) 100%); */
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
   overflow-y: scroll;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none;

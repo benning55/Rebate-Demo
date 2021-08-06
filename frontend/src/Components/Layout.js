@@ -20,7 +20,6 @@ const drawerWidth = 240
 const useStyles = makeStyles((theme) => {
   return {
     page: {
-      background: "#f9f9f9",
       width: "100%",
       padding: theme.spacing(8),
     },
@@ -29,13 +28,13 @@ const useStyles = makeStyles((theme) => {
     },
     drawPaper: {
       width: drawerWidth,
-      background: "#81c784",
+      background: theme.palette.primary.main,
     },
     root: {
       display: "flex",
     },
     active: {
-      background: "#f4f4f4",
+      background: theme.palette.secondary.main,
     },
     title: {
       padding: theme.spacing(3),
@@ -56,12 +55,12 @@ export default function Layout({ children }) {
   const menuItems = [
     {
       text: "Default Target",
-      icon: <ListIcon color='secondary' />,
+      icon: <ListIcon style={{ color: "white" }} />,
       path: "/",
     },
     {
       text: "Default Rebate",
-      icon: <RedeemIcon color='secondary' />,
+      icon: <RedeemIcon style={{ color: "white" }} />,
       path: "/dd",
     },
   ]
@@ -81,7 +80,11 @@ export default function Layout({ children }) {
         classes={{ paper: classes.drawPaper }}
       >
         <div>
-          <Typography variant='h5' className={classes.title}>
+          <Typography
+            variant='h5'
+            className={classes.title}
+            style={{ color: "white" }}
+          >
             Rebate Calculator
           </Typography>
         </div>
@@ -96,7 +99,9 @@ export default function Layout({ children }) {
               className={location.pathname == item.path ? classes.active : null}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText>{item.text}</ListItemText>
+              <ListItemText style={{ color: "white" }}>
+                {item.text}
+              </ListItemText>
             </ListItem>
           ))}
         </List>

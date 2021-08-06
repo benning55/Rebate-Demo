@@ -36,7 +36,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         fields = ('email', 'username', 'password', 'picture')
 
 
-class TargetNameSerializer(serializers.ModelSerializer):
+class ReadTargetNameSerializer(serializers.ModelSerializer):
     create_date = serializers.SerializerMethodField()
 
     class Meta:
@@ -50,7 +50,7 @@ class TargetNameSerializer(serializers.ModelSerializer):
         return date.strftime("%Y/%m/%d")
 
 
-class TargetTypeSerializer(serializers.ModelSerializer):
+class ReadTargetTypeSerializer(serializers.ModelSerializer):
     create_date = serializers.SerializerMethodField()
     start_date = serializers.SerializerMethodField()
     end_date = serializers.SerializerMethodField()
@@ -78,5 +78,21 @@ class TargetTypeSerializer(serializers.ModelSerializer):
         return date.strftime("%Y/%m/%d")
 
 class TargetSerializer(serializers.Serializer):
-    target_name = TargetNameSerializer()
-    target_type = TargetTypeSerializer(many=True)
+    target_name = ReadTargetNameSerializer()
+    target_type = ReadTargetTypeSerializer(many=True)
+
+
+class WriteTargetNameSerializer(serializers.Serializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=TargetName.objects.all())
+
+
+class WriteTargetTypeSerializer(serializers.Serializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=TargetType.objects.all(), required=False)
+    name = serializers.CharField(max_length=255)
+    min_rate = serializers.DecimalField(decimal_places=2, max_digits=20)
+    max_rate = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+
+
+class WriteTargetSerializer(serializers.Serializer):
+    target_name_id = serializers.PrimaryKeyRelatedField(queryset=TargetName.objects.all())
+    target_types = WriteTargetTypeSerializer(many=True)
