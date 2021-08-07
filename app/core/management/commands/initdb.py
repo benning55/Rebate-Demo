@@ -31,6 +31,7 @@ class Command(BaseCommand):
 
             target_name = TargetName.objects.create(
                 owner=owner,
+                name="default"
             )
 
             TargetType.objects.create(

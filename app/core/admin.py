@@ -88,7 +88,7 @@ class UserAdmin(BaseUserAdmin):
 
 
 class TargetNameAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'create_date']
+    list_display = ['id', 'name', 'owner', 'create_date']
     search_fields = ['name']
     list_per_page = 10
 

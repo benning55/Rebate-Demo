@@ -64,26 +64,6 @@ class ReadOwnerSerializer(serializers.ModelSerializer):
         return date.strftime("%Y/%m/%d")
 
 
-class ReadTargetNameSerializer(serializers.ModelSerializer):
-    create_date = serializers.SerializerMethodField()
-    owner = serializers.SerializerMethodField()
-
-    class Meta:
-        model = TargetName
-        fields = '__all__'
-        depth = 1
-
-    def get_create_date(self, obj):
-        if obj.create_date is None:
-            return None
-        date = obj.create_date
-        return date.strftime("%Y/%m/%d")
-
-    def get_owner(self, obj):
-        serializer = ReadOwnerSerializer(obj.owner)
-        return serializer.data
-
-
 class ReadTargetTypeSerializer(serializers.ModelSerializer):
     create_date = serializers.SerializerMethodField()
 
@@ -96,6 +76,31 @@ class ReadTargetTypeSerializer(serializers.ModelSerializer):
             return None
         date = obj.create_date
         return date.strftime("%Y/%m/%d")
+
+
+class ReadTargetNameSerializer(serializers.ModelSerializer):
+    create_date = serializers.SerializerMethodField()
+    owner = serializers.SerializerMethodField()
+    target_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TargetName
+        fields = '__all__'
+
+    def get_create_date(self, obj):
+        if obj.create_date is None:
+            return None
+        date = obj.create_date
+        return date.strftime("%Y/%m/%d")
+
+    def get_owner(self, obj):
+        serializer = ReadOwnerSerializer(obj.owner)
+        return serializer.data
+
+    def get_target_type(self, obj):
+        info = TargetType.objects.filter(target_name_id=obj.id)
+        serializer = ReadTargetTypeSerializer(info, many=True)
+        return serializer.data
 
 
 class ReadRebateTypeSerializer(serializers.ModelSerializer):
@@ -135,6 +140,11 @@ class ReadRebateNameSerializer(serializers.ModelSerializer):
 class TargetSerializer(serializers.Serializer):
     target_name = ReadTargetNameSerializer()
     target_type = ReadTargetTypeSerializer(many=True)
+
+
+class CustomTemplateSerializer(serializers.Serializer):
+    target = ReadTargetNameSerializer()
+    rebate = ReadRebateNameSerializer(many=True)
 
 
 class WriteTargetNameSerializer(serializers.Serializer):

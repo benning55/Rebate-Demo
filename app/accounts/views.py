@@ -22,6 +22,7 @@ from django.db import transaction, DatabaseError
 
 
 TargetTimeline = namedtuple('Timeline', ('target_name', 'target_type'))
+CustomTemplate = namedtuple('Timeline2', ('target', 'rebate'))
 
 @api_view(['GET', ])
 @permission_classes([IsAuthenticated, ])
@@ -228,3 +229,21 @@ class RebateDefaultManage(APIView):
                 return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CustomManage(APIView):
+    """
+    Make custom rebate and target
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        owner = get_object_or_404(Owner.objects.all(), name='Default')
+        target = get_object_or_404(TargetName.objects.all(), owner=owner)
+        rebate = RebateName.objects.filter(owner_id=owner.id)
+        template = CustomTemplate(
+            target=target,
+            rebate=rebate
+        )
+        serializer = serializers.CustomTemplateSerializer(template)
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
