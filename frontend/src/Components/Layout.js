@@ -66,9 +66,9 @@ export default function Layout({ children }) {
       path: "/rebate-default",
     },
     {
-      text: "Custom Mixin",
+      text: "Custom Template",
       icon: <ListIcon style={{ color: "white" }} />,
-      path: "/ff",
+      path: "/custom-template",
     },
     {
       text: "Calculate",

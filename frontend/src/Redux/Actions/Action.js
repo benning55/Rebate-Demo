@@ -78,11 +78,23 @@ export const editDefaultRebate = (data) => {
   }
 }
 
+export const getCustomTemplate = () => {
+  return async function (dispatch, getState) {
+    try {
+      const resp = await axios.get(`${ENDPOINT}/custom/`)
+      return resp
+    } catch (err) {
+      return err.response
+    }
+  }
+}
+
 export default {
   getDefault,
   editDefault,
   getDefaultRebate,
   getNameColumn,
   editDefaultRebate,
+  getCustomTemplate,
   isLoading,
 }

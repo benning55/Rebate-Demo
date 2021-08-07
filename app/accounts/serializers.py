@@ -98,7 +98,7 @@ class ReadTargetNameSerializer(serializers.ModelSerializer):
         return serializer.data
 
     def get_target_type(self, obj):
-        info = TargetType.objects.filter(target_name_id=obj.id)
+        info = TargetType.objects.filter(target_name_id=obj.id).order_by('min_rate')
         serializer = ReadTargetTypeSerializer(info, many=True)
         return serializer.data
 

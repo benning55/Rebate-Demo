@@ -5,6 +5,9 @@ import { createTheme, ThemeProvider } from "@material-ui/core"
 import { orange } from "@material-ui/core/colors"
 import Layout from "./Components/Layout"
 import RebateDefault from "./Pages/RebateDefault"
+import CustomTemplate from "./Pages/CustomTemplate"
+import { MuiPickersUtilsProvider } from "@material-ui/pickers"
+import MomentUtils from "@date-io/moment"
 
 const theme = createTheme({
   palette: {
@@ -20,21 +23,26 @@ const theme = createTheme({
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <Router>
-        <ReactNotification />
-        <Layout>
-          <Switch>
-            <Route exact path='/'>
-              <Home />
-            </Route>
-            <Route exact path='/rebate-default'>
-              <RebateDefault />
-            </Route>
-          </Switch>
-        </Layout>
-      </Router>
-    </ThemeProvider>
+    <MuiPickersUtilsProvider utils={MomentUtils}>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <ReactNotification />
+          <Layout>
+            <Switch>
+              <Route exact path='/'>
+                <Home />
+              </Route>
+              <Route exact path='/rebate-default'>
+                <RebateDefault />
+              </Route>
+              <Route exact path='/custom-template'>
+                <CustomTemplate />
+              </Route>
+            </Switch>
+          </Layout>
+        </Router>
+      </ThemeProvider>
+    </MuiPickersUtilsProvider>
   )
 }
 
