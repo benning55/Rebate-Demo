@@ -16,7 +16,7 @@ from django.core.files.base import ContentFile
 import tempfile
 from weasyprint import HTML
 from accounts import serializers
-from core.models import User, TargetName, TargetType
+from core.models import User, TargetName, TargetType, Owner, RebateName, RebateType
 from rest_framework.views import APIView
 from django.db import transaction, DatabaseError
 
@@ -31,6 +31,26 @@ def get_user(request, *args, **kwargs):
     query = User.objects.get(pk=user.id)
     serializer = serializers.UserSerializer(query)
     return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', ])
+@permission_classes([AllowAny, ])
+def get_column(request, *args, **kwargs):
+    """Get user information"""
+    all_name = dict()
+    target_name = get_object_or_404(TargetName.objects.all(), name='Default')
+    target_type = TargetType.objects.filter(target_name_id=target_name.id)
+    for query in target_type:
+        if query.name not in all_name:
+            all_name[query.name] = query.name
+    print(all_name)
+    data = {
+        "title": 'Name',
+        "field": 'name',
+        "align": "center",
+        "lookup": all_name
+    }
+    return Response({'data': data}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST', ])
@@ -119,18 +139,15 @@ class TargetDefaultManage(APIView):
         else:
             return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
-# class TargetManage(APIView):
-#     """
-#     Access target model
-#     """
-#
-#     def get(self, request, *args, **kwargs):
-#         """Get all target"""
-#         pk = kwargs.get("pk")
-#         start_date = request.query_params.get('start_date', None)
-#         end_date = request.query_params.get('end_date', None)
-#         name = request.query_params.get('name', None)
-#         if name is None:
-#             return Response({'detail': 'error'}, status=status.HTTP_400_BAD_REQUEST)
-#         target_name = get_object_or_404(TargetName.objects.)
-#         if pk is None:
+
+class RebateDefaultManage(APIView):
+    """
+    handle all transaction with default rebate
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        owner = get_object_or_404(Owner.objects.all(), name='Default')
+        rebate_name = RebateName.objects.filter(owner_id=owner.id)
+        serializer = serializers.ReadRebateNameSerializer(rebate_name, many=True)
+        return Response({'data': serializer.data}, status=status.HTTP_200_OK)

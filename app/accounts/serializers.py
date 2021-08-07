@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import User, TargetName, TargetType
+from core.models import User, TargetName, TargetType, Owner, RebateName, RebateType
 from django.contrib.auth.models import Permission
 import requests
 from core.Types import Types
@@ -76,6 +76,69 @@ class ReadTargetTypeSerializer(serializers.ModelSerializer):
             return None
         date = obj.end_date
         return date.strftime("%Y/%m/%d")
+
+
+class ReadOwnerSerializer(serializers.ModelSerializer):
+    create_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Owner
+        fields = '__all__'
+
+    def get_create_date(self, obj):
+        if obj.create_date is None:
+            return None
+        date = obj.create_date
+        return date.strftime("%Y/%m/%d")
+
+
+class ReadRebateTypeSerializer(serializers.ModelSerializer):
+    create_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RebateType
+        fields = '__all__'
+
+    def get_create_date(self, obj):
+        if obj.create_date is None:
+            return None
+        date = obj.create_date
+        return date.strftime("%Y/%m/%d")
+
+
+class ReadRebateNameSerializer(serializers.ModelSerializer):
+    create_date = serializers.SerializerMethodField()
+    start_date = serializers.SerializerMethodField()
+    end_date = serializers.SerializerMethodField()
+    rebate_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RebateName
+        fields = '__all__'
+
+    def get_create_date(self, obj):
+        if obj.create_date is None:
+            return None
+        date = obj.create_date
+        return date.strftime("%Y/%m/%d")
+
+    def get_start_date(self, obj):
+        if obj.start_date is None:
+            return None
+        date = obj.start_date
+        return date.strftime("%Y/%m/%d")
+
+    def get_end_date(self, obj):
+        if obj.end_date is None:
+            return None
+        date = obj.end_date
+        return date.strftime("%Y/%m/%d")
+
+    def get_rebate_type(self, obj):
+        rebate_type = RebateType.objects.filter(rebate_name_id=obj.id).order_by('rate')
+        serializer = ReadRebateTypeSerializer(rebate_type, many=True)
+        return serializer.data
+
 
 class TargetSerializer(serializers.Serializer):
     target_name = ReadTargetNameSerializer()

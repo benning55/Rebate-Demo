@@ -11,14 +11,14 @@
   margin: 0;
 }
 
-@font-face {
+/* @font-face {
  font-family: "Lota Grotesque Alt 1 Regular";
  font-style: normal;
  font-weight: normal;
  src: local("Lota Grotesque Alt 1 Regular"),
  url("./Public/Font/lota-grotesque-alt-1-cufonfonts-webfont/Los\ Andes\ \ Lota\ Grotesque\ Regular.woff")
  format("woff");
-}
+} */
 
 
 
@@ -27,7 +27,7 @@ html {
 }
 body {
   box-sizing: border-box;
-  font-family: "Lota Grotesque Alt 1 Regular" !important;
+  font-family: 'Roboto', sans-serif !important;
   /*background: transparent url("./Public/image/top2.png") 0% 0% no-repeat*/
   /*  padding-box;*/
   background: #f9f9f9;

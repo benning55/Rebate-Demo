@@ -4,7 +4,7 @@ from abc import ABC
 from django.core.management import BaseCommand, CommandError
 # from core.models import User
 from django.contrib.auth.models import Group, Permission, ContentType
-from core.models import User, TargetName, TargetType
+from core.models import User, TargetName, TargetType, RebateName, RebateType, Owner
 from django.utils.timezone import now
 
 
@@ -53,3 +53,46 @@ class Command(BaseCommand):
             )
         else:
             self.stdout.write("Already have target default")
+
+        if RebateName.objects.count() < 1:
+            self.stdout.write("Create default rebate")
+            owner = Owner.objects.create(
+                name='Default'
+            )
+
+            rebate_name1 = RebateName.objects.create(
+                name='Bonus รายลูกค้า',
+                owner_id=owner.id
+            )
+
+            rebate_name2 = RebateName.objects.create(
+                name='Bonus ยอดขาย',
+                owner_id=owner.id
+            )
+
+            RebateType.objects.create(
+                rebate_name_id=rebate_name1.id,
+                name='ต่ำ',
+                rate=200
+            )
+
+            RebateType.objects.create(
+                rebate_name_id=rebate_name2.id,
+                name='ต่ำ',
+                rate=200
+            )
+
+            RebateType.objects.create(
+                rebate_name_id=rebate_name1.id,
+                name='สูง',
+                rate=400
+            )
+
+            RebateType.objects.create(
+                rebate_name_id=rebate_name2.id,
+                name='สูง',
+                rate=400
+            )
+        else:
+            self.stdout.write("Already have rebate default")
+

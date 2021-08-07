@@ -90,10 +90,45 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = "Users"
 
 
+class Owner(models.Model):
+    """Create owner of rebate"""
+    name = models.CharField(max_length=255, unique=True)
+    create_date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
+class RebateName(models.Model):
+    """Name of the rebate"""
+    name = models.CharField(max_length=255)
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+    create_date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+
+class RebateType(models.Model):
+    """Rebate Type"""
+    rebate_name = models.ForeignKey(RebateName, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    rate = models.DecimalField(decimal_places=2, max_digits=20, default=0)
+    create_date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.name} for {self.rebate_name.name}'
+
+
 class TargetName(models.Model):
     """Create sell target"""
     name = models.CharField(max_length=255, unique=True)
     create_date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return self.name
 
 
 class TargetType(models.Model):
@@ -105,3 +140,8 @@ class TargetType(models.Model):
     start_date = models.DateField(null=True)
     end_date = models.DateField(null=True)
     create_date = models.DateField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.name} for {self.target_name.name}'
+
+

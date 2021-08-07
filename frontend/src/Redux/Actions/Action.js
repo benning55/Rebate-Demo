@@ -46,8 +46,45 @@ export const editDefault = (data) => {
   }
 }
 
+export const getNameColumn = () => {
+  return async function (dispatch, getState) {
+    try {
+      const resp = await axios.get(`${ENDPOINT}/column/`)
+      return resp.data.data
+    } catch (err) {
+      console.log(err)
+      return "hello"
+    }
+  }
+}
+
+export const getDefaultRebate = () => {
+  return async function (dispatch, getState) {
+    try {
+      const resp = await axios.get(`${ENDPOINT}/rebate/default/`)
+      return resp.data.data
+    } catch (err) {
+      console.log(err)
+      return "hello"
+    }
+  }
+}
+
+// export const editDefault = (data) => {
+//   return async function (dispatch, getState) {
+//     try {
+//       const resp = await axios.post(`${ENDPOINT}/target/default/`, data)
+//       return resp
+//     } catch (err) {
+//       return err.response
+//     }
+//   }
+// }
+
 export default {
   getDefault,
   editDefault,
+  getDefaultRebate,
+  getNameColumn,
   isLoading,
 }

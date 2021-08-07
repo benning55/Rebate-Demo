@@ -99,7 +99,28 @@ class TargetTypeAdmin(admin.ModelAdmin):
     list_per_page = 10
 
 
+class OwnerAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'create_date']
+    search_fields = ['name']
+    list_per_page = 10
+
+
+class RebateNameAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'owner_id', 'start_date', 'end_date']
+    search_fields = ['name']
+    list_per_page = 10
+
+
+class RebateTypeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name', 'rate', 'create_date']
+    search_fields = ['name']
+    list_per_page = 10
+
+
 
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.TargetName, TargetNameAdmin)
 admin.site.register(models.TargetType, TargetTypeAdmin)
+admin.site.register(models.Owner, OwnerAdmin)
+admin.site.register(models.RebateName, RebateNameAdmin)
+admin.site.register(models.RebateType, RebateTypeAdmin)

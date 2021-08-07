@@ -63,7 +63,7 @@ export default function Layout({ children }) {
     {
       text: "Default Rebate",
       icon: <RedeemIcon style={{ color: "white" }} />,
-      path: "/dd",
+      path: "/rebate-default",
     },
     {
       text: "Custom Mixin",
