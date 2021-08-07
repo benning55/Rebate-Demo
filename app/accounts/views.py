@@ -43,7 +43,6 @@ def get_column(request, *args, **kwargs):
     for query in target_type:
         if query.name not in all_name:
             all_name[query.name] = query.name
-    print(all_name)
     data = {
         "title": 'Name',
         "field": 'name',
@@ -151,3 +150,80 @@ class RebateDefaultManage(APIView):
         rebate_name = RebateName.objects.filter(owner_id=owner.id)
         serializer = serializers.ReadRebateNameSerializer(rebate_name, many=True)
         return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        serializer = serializers.WriteRebateNameSerializer(data=data, many=True)
+        if serializer.is_valid():
+            try:
+                with transaction.atomic():
+                    og_rebate_name = dict()
+                    owner = get_object_or_404(Owner.objects.all(), name='Default')
+                    for name in RebateName.objects.filter(owner=owner):
+                        if name.id not in og_rebate_name:
+                            og_rebate_name[name.id] = name.id
+
+                    # check if have rebate name id
+                    for item in serializer.validated_data:
+                        if item.get('id') is not None:
+                            og_rebate_type = dict()
+                            rebate_name = item.get('id')
+
+                            # add all og rebate_type to dict
+                            for og in RebateType.objects.filter(rebate_name=rebate_name):
+                                if og.id not in og_rebate_type:
+                                    og_rebate_type[og.id] = og.id
+
+                            # Create or update rebate_type
+                            for item2 in item.get('rebate_type'):
+                                if item2.get('id') is not None:
+                                    rebate_type = item2.get('id')
+                                    rebate_type.name = item2.get('name', rebate_type.name)
+                                    rebate_type.rate = item2.get('rate', rebate_type.rate)
+                                    rebate_type.rebate_name = rebate_name
+                                    rebate_type.save()
+
+                                    # check if it have in og if has remove from og
+                                    if rebate_type.id in og_rebate_type:
+                                        og_rebate_type.pop(rebate_type.id, None)
+                                else:
+                                    RebateType.objects.create(
+                                        name=item2.get('name'),
+                                        rate=item2.get('rate'),
+                                        rebate_name=rebate_name
+                                    )
+                            # Delete og that left out
+                            for id in og_rebate_type:
+                                deleted_target = get_object_or_404(RebateType.objects.all(), pk=id)
+                                deleted_target.delete()
+
+                            # check if it have in og rebate name if has remove from og
+                            if rebate_name.id in og_rebate_name:
+                                og_rebate_name.pop(rebate_name.id, None)
+                        else:
+                            """" Create new rebate_name and type """
+                            owner = get_object_or_404(Owner.objects.all(), name='Default')
+                            rebate_name = RebateName.objects.create(
+                                name=item.get('name'),
+                                owner=owner
+                            )
+
+                            # Create new rebate type:
+                            for item2 in item.get('rebate_type'):
+                                RebateType.objects.create(
+                                    name=item2.get('name'),
+                                    rate=item2.get('rate'),
+                                    rebate_name=rebate_name
+                                )
+
+                    # Delete og_rebate_name that left out
+                    for id in og_rebate_name:
+                        deleted_target = get_object_or_404(RebateName.objects.all(), pk=id)
+                        deleted_target.delete()
+                    return Response({'data': 'success'}, status=status.HTTP_200_OK)
+            except DatabaseError as e:
+                transaction.rollback()
+                return Response({'data': 'success'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print(serializer.errors)
+            return Response({'data': 'success'}, status=status.HTTP_400_BAD_REQUEST)

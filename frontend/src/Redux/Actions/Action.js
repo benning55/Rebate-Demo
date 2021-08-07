@@ -86,5 +86,6 @@ export default {
   editDefault,
   getDefaultRebate,
   getNameColumn,
+  editDefaultRebate,
   isLoading,
 }

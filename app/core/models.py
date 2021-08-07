@@ -92,7 +92,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Owner(models.Model):
     """Create owner of rebate"""
-    name = models.CharField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
     create_date = models.DateField(auto_now=True)
 
     def __str__(self):
@@ -103,8 +105,6 @@ class RebateName(models.Model):
     """Name of the rebate"""
     name = models.CharField(max_length=255)
     owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
-    start_date = models.DateField(null=True)
-    end_date = models.DateField(null=True)
     create_date = models.DateField(auto_now=True)
 
     def __str__(self):

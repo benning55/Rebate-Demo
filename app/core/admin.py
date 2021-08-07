@@ -100,13 +100,13 @@ class TargetTypeAdmin(admin.ModelAdmin):
 
 
 class OwnerAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'create_date']
+    list_display = ['id', 'name', 'create_date', 'start_date', 'end_date']
     search_fields = ['name']
     list_per_page = 10
 
 
 class RebateNameAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'owner_id', 'start_date', 'end_date']
+    list_display = ['id', 'name', 'owner_id']
     search_fields = ['name']
     list_per_page = 10
 

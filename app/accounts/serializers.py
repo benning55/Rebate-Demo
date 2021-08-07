@@ -80,6 +80,8 @@ class ReadTargetTypeSerializer(serializers.ModelSerializer):
 
 class ReadOwnerSerializer(serializers.ModelSerializer):
     create_date = serializers.SerializerMethodField()
+    start_date = serializers.SerializerMethodField()
+    end_date = serializers.SerializerMethodField()
 
     class Meta:
         model = Owner
@@ -89,6 +91,18 @@ class ReadOwnerSerializer(serializers.ModelSerializer):
         if obj.create_date is None:
             return None
         date = obj.create_date
+        return date.strftime("%Y/%m/%d")
+
+    def get_start_date(self, obj):
+        if obj.start_date is None:
+            return None
+        date = obj.start_date
+        return date.strftime("%Y/%m/%d")
+
+    def get_end_date(self, obj):
+        if obj.end_date is None:
+            return None
+        date = obj.end_date
         return date.strftime("%Y/%m/%d")
 
 
@@ -108,8 +122,6 @@ class ReadRebateTypeSerializer(serializers.ModelSerializer):
 
 class ReadRebateNameSerializer(serializers.ModelSerializer):
     create_date = serializers.SerializerMethodField()
-    start_date = serializers.SerializerMethodField()
-    end_date = serializers.SerializerMethodField()
     rebate_type = serializers.SerializerMethodField()
 
     class Meta:
@@ -120,18 +132,6 @@ class ReadRebateNameSerializer(serializers.ModelSerializer):
         if obj.create_date is None:
             return None
         date = obj.create_date
-        return date.strftime("%Y/%m/%d")
-
-    def get_start_date(self, obj):
-        if obj.start_date is None:
-            return None
-        date = obj.start_date
-        return date.strftime("%Y/%m/%d")
-
-    def get_end_date(self, obj):
-        if obj.end_date is None:
-            return None
-        date = obj.end_date
         return date.strftime("%Y/%m/%d")
 
     def get_rebate_type(self, obj):
@@ -159,5 +159,20 @@ class WriteTargetTypeSerializer(serializers.Serializer):
 class WriteTargetSerializer(serializers.Serializer):
     target_name_id = serializers.PrimaryKeyRelatedField(queryset=TargetName.objects.all())
     target_types = WriteTargetTypeSerializer(many=True)
+
+
+class WriteRebateTypeSerializer(serializers.Serializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=RebateType.objects.all(), required=False)
+    name = serializers.CharField(max_length=255)
+    rate = serializers.DecimalField(decimal_places=2, max_digits=20)
+
+
+class WriteRebateNameSerializer(serializers.Serializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=RebateName.objects.all(), required=False)
+    name = serializers.CharField(max_length=255)
+    owner = serializers.PrimaryKeyRelatedField(queryset=Owner.objects.all(), required=False)
+    rebate_type = WriteRebateTypeSerializer(many=True, required=False)
+
+
 
 

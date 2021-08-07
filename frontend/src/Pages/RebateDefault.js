@@ -281,8 +281,8 @@ export default function RebateDefault() {
               //   target_name_id: targetId,
               //   target_types: fetchRow,
               // }
-              // const result = await dispatch(Action.editDefault(data))
-              // console.log(result)
+              const result = await dispatch(Action.editDefaultRebate(tables))
+              console.log(result)
               // if (result.status === 200) {
               //   store.addNotification({
               //     ...notification,
