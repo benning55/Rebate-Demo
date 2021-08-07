@@ -29,8 +29,7 @@ export const getDefault = () => {
       const resp = await axios.get(`${ENDPOINT}/target/default/`)
       return resp
     } catch (err) {
-      console.log(err)
-      return "hello"
+      return err.response
     }
   }
 }
@@ -50,10 +49,9 @@ export const getNameColumn = () => {
   return async function (dispatch, getState) {
     try {
       const resp = await axios.get(`${ENDPOINT}/column/`)
-      return resp.data.data
+      return resp
     } catch (err) {
-      console.log(err)
-      return "hello"
+      return err.response
     }
   }
 }
@@ -62,10 +60,9 @@ export const getDefaultRebate = () => {
   return async function (dispatch, getState) {
     try {
       const resp = await axios.get(`${ENDPOINT}/rebate/default/`)
-      return resp.data.data
+      return resp
     } catch (err) {
-      console.log(err)
-      return "hello"
+      return err.response
     }
   }
 }

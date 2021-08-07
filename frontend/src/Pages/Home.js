@@ -71,7 +71,6 @@ const Home = () => {
   const fetchDefault = async () => {
     const result = await dispatch(Action.getDefault())
     if (result.status === 200) {
-      console.log(result)
       setFetchRow(result.data.data.target_type)
       setName(result.data.data.target_name.name)
       setTargetId(result.data.data.target_name.id)

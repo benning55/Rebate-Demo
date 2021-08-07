@@ -74,19 +74,37 @@ export default function RebateDefault() {
   useEffect(() => {
     fetchRebateDefault()
     fetchNameColumn()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const fetchRebateDefault = async () => {
     const result = await dispatch(Action.getDefaultRebate())
-    setTables(result)
-    console.log(result)
+    if (result.status === 200) {
+      setTables(result.data.data)
+    } else {
+      store.addNotification({
+        ...notification,
+        type: "danger",
+        title: "Fail",
+        message: "Server Error",
+      })
+    }
   }
 
   const fetchNameColumn = async () => {
     const result = await dispatch(Action.getNameColumn())
-    const newColumn = [...fetchColumn]
-    newColumn[0] = result
-    setFetchColumn(newColumn)
+    if (result.status === 200) {
+      const newColumn = [...fetchColumn]
+      newColumn[0] = result.data.data
+      setFetchColumn(newColumn)
+    } else {
+      store.addNotification({
+        ...notification,
+        type: "danger",
+        title: "Fail",
+        message: "Server Error",
+      })
+    }
   }
 
   const deleteRebate = (index) => {
