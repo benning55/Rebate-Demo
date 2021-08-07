@@ -23,41 +23,35 @@ class Command(BaseCommand):
         else:
             self.stdout.write("Already have super user")
 
-        target_name = TargetName.objects.all()
+        if Owner.objects.count() < 1:
+            self.stdout.write("Create default data")
+            owner = Owner.objects.create(
+                name="Default"
+            )
 
-        if target_name.count() < 1:
-            self.stdout.write("Create default target")
-            name = TargetName.objects.create(
-                name="Default",
+            target_name = TargetName.objects.create(
+                owner=owner,
             )
 
             TargetType.objects.create(
                 name="ต่ำ",
                 min_rate=100,
                 max_rate=200,
-                target_name_id=name.id
+                target_name_id=target_name.id
             )
 
             TargetType.objects.create(
                 name="กลาง",
                 min_rate=201,
                 max_rate=300,
-                target_name_id=name.id
+                target_name_id=target_name.id
             )
 
             TargetType.objects.create(
                 name="สูง",
                 min_rate=301,
                 max_rate=None,
-                target_name_id=name.id
-            )
-        else:
-            self.stdout.write("Already have target default")
-
-        if RebateName.objects.count() < 1:
-            self.stdout.write("Create default rebate")
-            owner = Owner.objects.create(
-                name='Default'
+                target_name_id=target_name.id
             )
 
             rebate_name1 = RebateName.objects.create(
@@ -94,5 +88,5 @@ class Command(BaseCommand):
                 rate=400
             )
         else:
-            self.stdout.write("Already have rebate default")
+            self.stdout.write("Already have default")
 

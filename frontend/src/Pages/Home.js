@@ -70,9 +70,19 @@ const Home = () => {
 
   const fetchDefault = async () => {
     const result = await dispatch(Action.getDefault())
-    setFetchRow(result.target_type)
-    setName(result.target_name.name)
-    setTargetId(result.target_name.id)
+    if (result.status === 200) {
+      console.log(result)
+      setFetchRow(result.data.data.target_type)
+      setName(result.data.data.target_name.name)
+      setTargetId(result.data.data.target_name.id)
+    } else {
+      store.addNotification({
+        ...notification,
+        type: "danger",
+        title: "Fail",
+        message: "Server Error",
+      })
+    }
   }
 
   return (

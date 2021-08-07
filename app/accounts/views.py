@@ -38,7 +38,8 @@ def get_user(request, *args, **kwargs):
 def get_column(request, *args, **kwargs):
     """Get user information"""
     all_name = dict()
-    target_name = get_object_or_404(TargetName.objects.all(), name='Default')
+    owner = get_object_or_404(Owner.objects.all(), name='Default')
+    target_name = get_object_or_404(TargetName.objects.all(), owner=owner)
     target_type = TargetType.objects.filter(target_name_id=target_name.id)
     for query in target_type:
         if query.name not in all_name:
@@ -83,7 +84,8 @@ class TargetDefaultManage(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
-        target_name = get_object_or_404(TargetName.objects.all(), name='Default')
+        owner = get_object_or_404(Owner.objects.all(), name='Default')
+        target_name = get_object_or_404(TargetName.objects.all(), owner_id=owner.id)
         target_type = TargetType.objects.filter(target_name_id=target_name.id).order_by('min_rate')
         target_time_line = TargetTimeline(
             target_name=target_name,

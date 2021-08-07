@@ -36,48 +36,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         fields = ('email', 'username', 'password', 'picture')
 
 
-class ReadTargetNameSerializer(serializers.ModelSerializer):
-    create_date = serializers.SerializerMethodField()
-
-    class Meta:
-        model = TargetName
-        fields = '__all__'
-
-    def get_create_date(self, obj):
-        if obj.create_date is None:
-            return None
-        date = obj.create_date
-        return date.strftime("%Y/%m/%d")
-
-
-class ReadTargetTypeSerializer(serializers.ModelSerializer):
-    create_date = serializers.SerializerMethodField()
-    start_date = serializers.SerializerMethodField()
-    end_date = serializers.SerializerMethodField()
-
-    class Meta:
-        model = TargetType
-        fields = '__all__'
-
-    def get_create_date(self, obj):
-        if obj.create_date is None:
-            return None
-        date = obj.create_date
-        return date.strftime("%Y/%m/%d")
-
-    def get_start_date(self, obj):
-        if obj.start_date is None:
-            return None
-        date = obj.start_date
-        return date.strftime("%Y/%m/%d")
-
-    def get_end_date(self, obj):
-        if obj.end_date is None:
-            return None
-        date = obj.end_date
-        return date.strftime("%Y/%m/%d")
-
-
 class ReadOwnerSerializer(serializers.ModelSerializer):
     create_date = serializers.SerializerMethodField()
     start_date = serializers.SerializerMethodField()
@@ -103,6 +61,40 @@ class ReadOwnerSerializer(serializers.ModelSerializer):
         if obj.end_date is None:
             return None
         date = obj.end_date
+        return date.strftime("%Y/%m/%d")
+
+
+class ReadTargetNameSerializer(serializers.ModelSerializer):
+    create_date = serializers.SerializerMethodField()
+    owner = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TargetName
+        fields = '__all__'
+        depth = 1
+
+    def get_create_date(self, obj):
+        if obj.create_date is None:
+            return None
+        date = obj.create_date
+        return date.strftime("%Y/%m/%d")
+
+    def get_owner(self, obj):
+        serializer = ReadOwnerSerializer(obj.owner)
+        return serializer.data
+
+
+class ReadTargetTypeSerializer(serializers.ModelSerializer):
+    create_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TargetType
+        fields = '__all__'
+
+    def get_create_date(self, obj):
+        if obj.create_date is None:
+            return None
+        date = obj.create_date
         return date.strftime("%Y/%m/%d")
 
 

@@ -94,7 +94,7 @@ class TargetNameAdmin(admin.ModelAdmin):
 
 
 class TargetTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'start_date', 'end_date']
+    list_display = ['id', 'name', 'min_rate', 'max_rate']
     search_fields = ['name']
     list_per_page = 10
 

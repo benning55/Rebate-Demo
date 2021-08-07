@@ -124,7 +124,8 @@ class RebateType(models.Model):
 
 class TargetName(models.Model):
     """Create sell target"""
-    name = models.CharField(max_length=255, unique=True)
+    owner = models.ForeignKey(Owner, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, null=True)
     create_date = models.DateField(auto_now=True)
 
     def __str__(self):
@@ -137,8 +138,6 @@ class TargetType(models.Model):
     name = models.CharField(max_length=255)
     min_rate = models.DecimalField(decimal_places=2, max_digits=20, default=0)
     max_rate = models.DecimalField(decimal_places=2, max_digits=20, null=True)
-    start_date = models.DateField(null=True)
-    end_date = models.DateField(null=True)
     create_date = models.DateField(auto_now=True)
 
     def __str__(self):

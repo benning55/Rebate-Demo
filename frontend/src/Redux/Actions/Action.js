@@ -27,7 +27,7 @@ export const getDefault = () => {
   return async function (dispatch, getState) {
     try {
       const resp = await axios.get(`${ENDPOINT}/target/default/`)
-      return resp.data.data
+      return resp
     } catch (err) {
       console.log(err)
       return "hello"
