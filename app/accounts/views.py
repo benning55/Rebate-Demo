@@ -147,7 +147,7 @@ class RebateDefaultManage(APIView):
 
     def get(self, request, *args, **kwargs):
         owner = get_object_or_404(Owner.objects.all(), name='Default')
-        rebate_name = RebateName.objects.filter(owner_id=owner.id)
+        rebate_name = RebateName.objects.filter(owner_id=owner.id).order_by('id')
         serializer = serializers.ReadRebateNameSerializer(rebate_name, many=True)
         return Response({'data': serializer.data}, status=status.HTTP_200_OK)
 
@@ -223,7 +223,6 @@ class RebateDefaultManage(APIView):
                     return Response({'data': 'success'}, status=status.HTTP_200_OK)
             except DatabaseError as e:
                 transaction.rollback()
-                return Response({'data': 'success'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
         else:
-            print(serializer.errors)
-            return Response({'data': 'success'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,18 +1,14 @@
 import React from "react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Link } from "react-router-dom"
 import {
   Typography,
-  Container,
   Button,
   Grid,
   Box,
   IconButton,
-  TextField,
   FormControl,
   InputAdornment,
-  InputLabel,
   OutlinedInput,
 } from "@material-ui/core"
 import MaterialTable, { MTableToolbar } from "material-table"
@@ -23,7 +19,7 @@ import { store } from "react-notifications-component"
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever"
 import CheckIcon from "@material-ui/icons/Check"
 import EditIcon from "@material-ui/icons/Edit"
-import { fas } from "@fortawesome/free-solid-svg-icons"
+import ConfirmDialog from "../Components/ConfirmDialog"
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -61,6 +57,8 @@ export default function RebateDefault() {
 
   const [tables, setTables] = useState(null)
   const [onEdit, setOnEdit] = useState(false)
+  const [deleteDialog, setDeleteDialog] = useState(false)
+  const [deleteIndex, setDeleteIndex] = useState(null)
 
   const [fetchColumn, setFetchColumn] = useState([
     { title: "Name", field: "name", align: "center" },
@@ -115,6 +113,10 @@ export default function RebateDefault() {
     setOnEdit(!onEdit)
   }
 
+  const handleDeleteDialogClose = () => {
+    setDeleteDialog(false)
+  }
+
   return (
     <div>
       <Grid container spacing={3}>
@@ -140,7 +142,7 @@ export default function RebateDefault() {
         </Grid>
         {tables &&
           tables.map((table, index) => (
-            <Grid item xs={12} md={6} key={table.id}>
+            <Grid item xs={12} md={6} key={index}>
               <MaterialTable
                 title={table.name}
                 columns={fetchColumn}
@@ -157,7 +159,10 @@ export default function RebateDefault() {
                         <IconButton
                           aria-label='delete'
                           className={classes.margin}
-                          onClick={() => deleteRebate(index)}
+                          onClick={() => {
+                            setDeleteIndex(index)
+                            setDeleteDialog(true)
+                          }}
                         >
                           <DeleteForeverIcon
                             fontSize='large'
@@ -273,38 +278,39 @@ export default function RebateDefault() {
             variant='contained'
             color='primary'
             onClick={async () => {
-              console.log(tables)
-              console.log(tmp)
-              // dispatch(Action.isLoading(true))
-              // setTimeout(() => {}, 1500)
-              // const data = {
-              //   target_name_id: targetId,
-              //   target_types: fetchRow,
-              // }
+              dispatch(Action.isLoading(true))
               const result = await dispatch(Action.editDefaultRebate(tables))
-              console.log(result)
-              // if (result.status === 200) {
-              //   store.addNotification({
-              //     ...notification,
-              //     type: "success",
-              //     title: "Success",
-              //     message: "ss",
-              //   })
-              // } else {
-              //   store.addNotification({
-              //     ...notification,
-              //     type: "danger",
-              //     title: "Fail",
-              //     message: result.data.detail,
-              //   })
-              // }
-              // dispatch(Action.isLoading(false))
+              setTimeout(() => {
+                if (result.status === 200) {
+                  store.addNotification({
+                    ...notification,
+                    type: "success",
+                    title: "Success",
+                    message: "Update success",
+                  })
+                } else {
+                  store.addNotification({
+                    ...notification,
+                    type: "danger",
+                    title: "Fail",
+                    message: result.data.detail,
+                  })
+                }
+                dispatch(Action.isLoading(false))
+              }, 1000)
             }}
           >
             Submit
           </Button>
         </Grid>
       </Grid>
+      <ConfirmDialog
+        index={deleteIndex}
+        deleteDialogOpen={deleteDialog}
+        handleDeleteDialogClose={handleDeleteDialogClose}
+        deleteConfirm={deleteRebate}
+      />
+      <Loading loading={isLoading} />
     </div>
   )
 }

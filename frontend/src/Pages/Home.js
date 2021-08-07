@@ -92,6 +92,7 @@ const Home = () => {
               options={{
                 paging: false,
                 addRowPosition: "first",
+                showTitle: false,
               }}
               components={{
                 Toolbar: (props) => (
@@ -138,29 +139,29 @@ const Home = () => {
             color='primary'
             onClick={async () => {
               dispatch(Action.isLoading(true))
-              setTimeout(() => {}, 1500)
               const data = {
                 target_name_id: targetId,
                 target_types: fetchRow,
               }
               const result = await dispatch(Action.editDefault(data))
-              console.log(result)
-              if (result.status === 200) {
-                store.addNotification({
-                  ...notification,
-                  type: "success",
-                  title: "Success",
-                  message: "ss",
-                })
-              } else {
-                store.addNotification({
-                  ...notification,
-                  type: "danger",
-                  title: "Fail",
-                  message: result.data.detail,
-                })
-              }
-              dispatch(Action.isLoading(false))
+              setTimeout(() => {
+                if (result.status === 200) {
+                  store.addNotification({
+                    ...notification,
+                    type: "success",
+                    title: "Success",
+                    message: "Update success",
+                  })
+                } else {
+                  store.addNotification({
+                    ...notification,
+                    type: "danger",
+                    title: "Fail",
+                    message: result.data.detail,
+                  })
+                }
+                dispatch(Action.isLoading(false))
+              }, 1000)
             }}
           >
             Submit
