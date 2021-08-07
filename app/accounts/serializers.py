@@ -159,3 +159,5 @@ class WriteTargetTypeSerializer(serializers.Serializer):
 class WriteTargetSerializer(serializers.Serializer):
     target_name_id = serializers.PrimaryKeyRelatedField(queryset=TargetName.objects.all())
     target_types = WriteTargetTypeSerializer(many=True)
+
+

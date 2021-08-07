@@ -22,6 +22,8 @@ import Loading from "../Components/Loading"
 import { store } from "react-notifications-component"
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever"
 import CheckIcon from "@material-ui/icons/Check"
+import EditIcon from "@material-ui/icons/Edit"
+import { fas } from "@fortawesome/free-solid-svg-icons"
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -58,7 +60,7 @@ export default function RebateDefault() {
   const classes = useStyles()
 
   const [tables, setTables] = useState(null)
-  const [tmpName, setTmpName] = useState("")
+  const [onEdit, setOnEdit] = useState(false)
 
   const [fetchColumn, setFetchColumn] = useState([
     { title: "Name", field: "name", align: "center" },
@@ -104,10 +106,13 @@ export default function RebateDefault() {
   }
 
   const onNameChange = (index) => {
-    const newTables = [...tables]
-    newTables[index].name = tmp
-    setTables(newTables)
+    if (tmp !== "") {
+      const newTables = [...tables]
+      newTables[index].name = tmp
+      setTables(newTables)
+    }
     tmp = ""
+    setOnEdit(!onEdit)
   }
 
   return (
@@ -165,30 +170,48 @@ export default function RebateDefault() {
                         alignItems='center'
                         justifyContent='space-between'
                       >
-                        <div className={classes.margin}>
+                        <div
+                          className={classes.margin}
+                          style={{ display: "flex" }}
+                        >
                           <FormControl
                             className={classes.margin}
                             variant='outlined'
                           >
                             <OutlinedInput
+                              disabled={!onEdit}
                               type='text'
                               id={`comp-${index}`}
                               defaultValue={table.name}
                               onChange={(value) => {
                                 tmp = value.target.value
                               }}
+                              style={{ color: "black" }}
                               endAdornment={
-                                <InputAdornment position='end'>
-                                  <IconButton
-                                    onClick={() => onNameChange(index)}
-                                    edge='end'
-                                  >
-                                    <CheckIcon />
-                                  </IconButton>
-                                </InputAdornment>
+                                onEdit ? (
+                                  <InputAdornment position='end'>
+                                    <IconButton
+                                      onClick={() => onNameChange(index)}
+                                      edge='end'
+                                    >
+                                      <CheckIcon />
+                                    </IconButton>
+                                  </InputAdornment>
+                                ) : (
+                                  false
+                                )
                               }
                             />
                           </FormControl>
+                          {onEdit ? null : (
+                            <IconButton
+                              onClick={() => {
+                                setOnEdit(!onEdit)
+                              }}
+                            >
+                              <EditIcon style={{ color: "black" }} />
+                            </IconButton>
+                          )}
                         </div>
                         <MTableToolbar {...props} />
                       </Box>
