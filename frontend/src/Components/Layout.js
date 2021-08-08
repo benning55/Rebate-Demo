@@ -73,7 +73,7 @@ export default function Layout({ children }) {
     {
       text: "Calculate",
       icon: <RedeemIcon style={{ color: "white" }} />,
-      path: "/55",
+      path: "/calculate",
     },
   ]
   return (

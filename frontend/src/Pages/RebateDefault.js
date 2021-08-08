@@ -160,7 +160,7 @@ export default function RebateDefault() {
         </Grid>
         {tables &&
           tables.map((table, index) => (
-            <Grid item xs={12} md={6} key={index}>
+            <Grid item xs={12} key={index}>
               <MaterialTable
                 title={table.name}
                 columns={fetchColumn}

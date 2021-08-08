@@ -8,13 +8,14 @@ import RebateDefault from "./Pages/RebateDefault"
 import CustomTemplate from "./Pages/CustomTemplate"
 import { MuiPickersUtilsProvider } from "@material-ui/pickers"
 import MomentUtils from "@date-io/moment"
+import Calculate from "./Pages/Calculate"
 
 const theme = createTheme({
   palette: {
     primary: {
-      dark: "#1b5e20",
-      main: "#2e7d32",
-      light: "#388e3c",
+      dark: "#1565c0",
+      main: "#1e88e5",
+      light: "#2196f3",
       contrastText: "#e8f5e9",
     },
     secondary: orange,
@@ -37,6 +38,9 @@ function App() {
               </Route>
               <Route exact path='/custom-template'>
                 <CustomTemplate />
+              </Route>
+              <Route exact path='/calculate'>
+                <Calculate />
               </Route>
             </Switch>
           </Layout>

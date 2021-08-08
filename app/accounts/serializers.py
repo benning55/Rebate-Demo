@@ -157,7 +157,7 @@ class WriteTargetTypeSerializer(serializers.Serializer):
 class WriteTargetNameSerializer(serializers.Serializer):
     id = serializers.PrimaryKeyRelatedField(queryset=TargetName.objects.all())
     name = serializers.CharField(allow_blank=True)
-    target_types = WriteTargetTypeSerializer(many=True, required=False)
+    target_type = WriteTargetTypeSerializer(many=True, required=False)
 
 
 class WriteTargetSerializer(serializers.Serializer):
@@ -184,12 +184,20 @@ class WriteOwnerSerializer(serializers.Serializer):
     end_date = serializers.DateField(input_formats=["%Y/%m/%d"])
 
 
+class WrtieTestSerializer(serializers.Serializer):
+    value1 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+    value2 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+    value3 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+    value4 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+
+
+class WriteSomeSerializer(serializers.Serializer):
+    owner_name = serializers.CharField(max_length=255)
+    date = serializers.DateField(input_formats=["%Y/%m/%d"])
+    values = WrtieTestSerializer()
+
+
 class WriteCustomSerializer(serializers.Serializer):
     owner = WriteOwnerSerializer()
     target = WriteTargetNameSerializer()
     rebate = WriteRebateNameSerializer(many=True)
-
-
-
-
-

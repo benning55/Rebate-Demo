@@ -112,7 +112,7 @@ class RebateNameAdmin(admin.ModelAdmin):
 
 
 class RebateTypeAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'rate', 'create_date']
+    list_display = ['id', 'name', 'rate', 'create_date', 'rebate_name']
     search_fields = ['name']
     list_per_page = 10
 

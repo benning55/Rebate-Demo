@@ -36,7 +36,7 @@ const Home = () => {
   const classes = useStyles()
 
   const [fetchColumn, setFetchColumn] = useState([
-    { title: "Name", field: "name", align: "center" },
+    { title: "Level", field: "name", align: "center" },
     {
       title: "Min Rate",
       field: "min_rate",

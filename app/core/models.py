@@ -129,7 +129,7 @@ class TargetName(models.Model):
     create_date = models.DateField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return f'{self.id}'
 
 
 class TargetType(models.Model):

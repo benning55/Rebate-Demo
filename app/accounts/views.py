@@ -1,28 +1,20 @@
 from collections import namedtuple
-
-from django.shortcuts import render
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.parsers import JSONParser, FileUploadParser, MultiPartParser
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.template.loader import render_to_string
-from django.http import HttpResponse
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.contrib.auth.models import Permission, ContentType
-from django.db.models import Q
-from django.core.files.base import ContentFile
-import tempfile
-from weasyprint import HTML
 from accounts import serializers
 from core.models import User, TargetName, TargetType, Owner, RebateName, RebateType
 from rest_framework.views import APIView
 from django.db import transaction, DatabaseError
+from datetime import datetime
 
 
 TargetTimeline = namedtuple('Timeline', ('target_name', 'target_type'))
 CustomTemplate = namedtuple('Timeline2', ('target', 'rebate'))
+Range = namedtuple('Range', ['start', 'end'])
 
 @api_view(['GET', ])
 @permission_classes([IsAuthenticated, ])
@@ -31,6 +23,16 @@ def get_user(request, *args, **kwargs):
     user = request.user
     query = User.objects.get(pk=user.id)
     serializer = serializers.UserSerializer(query)
+    return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', ])
+@permission_classes([AllowAny, ])
+def get_owner(request, *args, **kwargs):
+    """Get user information"""
+    owners = Owner.objects.all().distinct('name')
+    owners = owners.exclude(name='Default')
+    serializer = serializers.ReadOwnerSerializer(owners, many=True)
     return Response({'data': serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -250,5 +252,137 @@ class CustomManage(APIView):
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        print(data)
-        return Response({'data': 'success'}, status=status.HTTP_200_OK)
+        serializer = serializers.WriteCustomSerializer(data=data)
+        if serializer.is_valid():
+            print(serializer.validated_data)
+            try:
+                with transaction.atomic():
+                    all_owner = Owner.objects.all()
+                    owner_obj = serializer.validated_data.get('owner')
+                    target_obj = serializer.validated_data.get('target')
+                    rebate_list = serializer.validated_data.get('rebate')
+
+                    queryset = Owner.objects.filter(name=owner_obj.get('name'))
+                    for i in queryset:
+                        r1 = Range(start=owner_obj.get('start_date'), end=owner_obj.get('end_date'))
+                        r2 = Range(i.start_date, end=i.end_date)
+                        latest_start = max(r1.start, r2.start)
+                        earliest_end = min(r1.end, r2.end)
+                        delta = (earliest_end - latest_start).days + 1
+                        overlap = max(0, delta)
+                        if overlap > 0:
+                            raise DatabaseError(f'Date overlap with {i.start_date} - {i.end_date}')
+
+                    # create owner
+                    owner = Owner.objects.create(
+                        name=owner_obj.get('name'),
+                        start_date=owner_obj.get('start_date'),
+                        end_date=owner_obj.get('end_date')
+                    )
+
+                    if target_obj.get('name') == 'default':
+                        name = None
+                    else:
+                        name = target_obj.get('name')
+
+                    # create target
+                    target_name = TargetName.objects.create(
+                        name=name,
+                        owner_id=owner.id
+                    )
+                    for target in target_obj.get('target_type'):
+                        TargetType.objects.create(
+                            target_name_id=target_name.id,
+                            name=target.get('name'),
+                            min_rate=target.get('min_rate'),
+                            max_rate=target.get('max_rate')
+                        )
+
+                    # create rebate
+                    for rebate in rebate_list:
+                        rebate_name = RebateName.objects.create(
+                            name=rebate.get('name'),
+                            owner_id=owner.id,
+                        )
+                        for item in rebate.get('rebate_type'):
+                            RebateType.objects.create(
+                                rebate_name_id=rebate_name.id,
+                                name=item.get('name'),
+                                rate=item.get('rate')
+                            )
+
+                    return Response({'data': 'success'}, status=status.HTTP_200_OK)
+            except DatabaseError as e:
+                transaction.rollback()
+                return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CalculateManage(APIView):
+    """Manage to calculate bonus via rebate"""
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        serializer = serializers.WriteSomeSerializer(data=data)
+        if serializer.is_valid():
+            info = []
+            name = serializer.validated_data.get('owner_name')
+            date = serializer.validated_data.get('date')
+            values = serializer.validated_data.get('values')
+            queryset = Owner.objects.filter(name=name)
+            queryset = queryset.filter(start_date__lte=date, end_date__gte=date)
+
+            if queryset.count() == 0:
+                return Response({'detail': 'There no data between this date data please go settings.'}, status=status.HTTP_400_BAD_REQUEST)
+
+            owner = queryset.first()
+
+            # find target range
+            target_name = TargetName.objects.get(owner_id=owner.id)
+            target_types = TargetType.objects.filter(target_name_id=target_name.id)
+
+            for value in values:
+                if values[value] is not None:
+                    box = 0
+                    rage_obj = dict()
+                    query = target_types.filter(min_rate__lte=values[value], max_rate__gte=values[value]).first()
+                    # test = target_types.filter(min_rate__lte=values[value], max_rate__gte=values[value])
+                    # for i in test:
+                    #     print(i.min_rate)
+                    if query is None:
+                        query = target_types.order_by('-min_rate').first()
+                        if values[value] >= query.min_rate:
+                            query = query
+                        else:
+                            continue
+                    rage_name = query.name
+
+                    # find rebate_type to get value
+                    rebate_names = RebateName.objects.filter(owner_id=owner.id)
+                    rebate_list = []
+                    for rebate_name in rebate_names:
+                        for rebate_type in RebateType.objects.filter(rebate_name_id=rebate_name.id):
+                            if rebate_type.name == rage_name:
+                                obj = {
+                                    "rebate_name": rebate_name.name,
+                                    "type_name": rebate_type.name,
+                                    "value": rebate_type.rate
+                                }
+                                rebate_list.append(obj)
+                                # print(rebate_name.name)
+                                box += rebate_type.rate
+                    rage_obj['rebate'] = rebate_list
+                    rage_obj['target'] = query.name
+                    rage_obj['start_date'] = owner.start_date.strftime("%Y/%m/%d")
+                    rage_obj['end_date'] = owner.end_date.strftime("%Y/%m/%d")
+                    rage_obj["min_rate"] = query.min_rate
+                    rage_obj['max_rate'] = query.max_rate
+                    rage_obj['title'] = value
+                    info.append(rage_obj)
+            # print(info)
+            return Response({'data': info}, status=status.HTTP_200_OK)
+        else:
+            print(serializer.errors)
+            return Response({'data': 'success'}, status=status.HTTP_200_OK)

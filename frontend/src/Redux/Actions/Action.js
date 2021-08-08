@@ -56,6 +56,17 @@ export const getNameColumn = () => {
   }
 }
 
+export const getOwners = () => {
+  return async function (dispatch, getState) {
+    try {
+      const resp = await axios.get(`${ENDPOINT}/owners/`)
+      return resp
+    } catch (err) {
+      return err.response
+    }
+  }
+}
+
 export const getDefaultRebate = () => {
   return async function (dispatch, getState) {
     try {
@@ -100,6 +111,17 @@ export const createCustom = (data) => {
   }
 }
 
+export const getCalculate = (data) => {
+  return async function (dispatch, getState) {
+    try {
+      const resp = await axios.post(`${ENDPOINT}/calculate/`, data)
+      return resp
+    } catch (err) {
+      return err.response
+    }
+  }
+}
+
 export default {
   getDefault,
   editDefault,
@@ -108,5 +130,7 @@ export default {
   editDefaultRebate,
   getCustomTemplate,
   createCustom,
+  getOwners,
   isLoading,
+  getCalculate,
 }

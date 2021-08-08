@@ -7,5 +7,7 @@ urlpatterns = [
     path('target/default/', views.TargetDefaultManage.as_view()),
     path('rebate/default/', views.RebateDefaultManage.as_view()),
     path('column/', views.get_column),
+    path('owners/', views.get_owner),
+    path('calculate/', views.CalculateManage.as_view()),
     path('custom/', views.CustomManage.as_view())
 ]
