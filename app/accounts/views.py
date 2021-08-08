@@ -186,8 +186,11 @@ class TargetDefaultManage(APIView):
                     # Delete the left one
                     for id in current_ids:
                         deleted_target = get_object_or_404(TargetType.objects.all(), pk=id)
-                        deleted_target.delete()
 
+                        for rebate_type in RebateType.objects.filter(name=deleted_target.name, rebate_name__owner__name="Default"):
+                            rebate_type.delete()
+
+                        deleted_target.delete()
                     return Response({'data': 'success'}, status=status.HTTP_200_OK)
             except DatabaseError as e:
                 transaction.rollback()

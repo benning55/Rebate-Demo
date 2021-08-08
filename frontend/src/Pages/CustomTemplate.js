@@ -245,7 +245,7 @@ export default function CustomTemplate() {
               columns={column}
               data={rows}
               options={{
-                paging: false,
+                paging: true,
                 addRowPosition: "first",
                 showTitle: false,
               }}

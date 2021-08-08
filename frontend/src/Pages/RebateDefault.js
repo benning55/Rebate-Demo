@@ -114,7 +114,7 @@ export default function RebateDefault() {
               columns={column}
               data={rows}
               options={{
-                paging: false,
+                paging: true,
                 addRowPosition: "first",
                 showTitle: false,
               }}
