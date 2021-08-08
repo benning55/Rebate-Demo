@@ -13,9 +13,9 @@ import Calculate from "./Pages/Calculate"
 const theme = createTheme({
   palette: {
     primary: {
-      dark: "#1565c0",
-      main: "#1e88e5",
-      light: "#2196f3",
+      dark: "#2962ff",
+      main: "#2979ff",
+      light: "#448aff",
       contrastText: "#e8f5e9",
     },
     secondary: orange,
