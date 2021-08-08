@@ -221,6 +221,7 @@ export default function CustomTemplate() {
               className={classes.calenderField}
               InputAdornmentProps={{ position: "start" }}
               onChange={(date) => {
+                console.log(date)
                 setStartDate(date)
               }}
             />
@@ -277,20 +278,24 @@ export default function CustomTemplate() {
                 onRowUpdate: (newData, oldData) =>
                   new Promise((resolve, reject) => {
                     setTimeout(() => {
-                      // const dataUpdate = [...fetchRow]
-                      // const index = oldData.tableData.id
-                      // dataUpdate[index] = newData
-                      // setFetchRow([...dataUpdate])
+                      const new_target = { ...target }
+                      const new_target_type = [...target.target_type]
+                      const index = oldData.tableData.id
+                      new_target_type[index] = newData
+                      new_target.target_type = new_target_type
+                      setTarget(new_target)
                       resolve()
                     }, 1000)
                   }),
                 onRowDelete: (oldData) =>
                   new Promise((resolve, reject) => {
                     setTimeout(() => {
-                      // const dataDelete = [...fetchRow]
-                      // const index = oldData.tableData.id
-                      // dataDelete.splice(index, 1)
-                      // setFetchRow([...dataDelete])
+                      const new_target = { ...target }
+                      const new_target_type = [...target.target_type]
+                      const index = oldData.tableData.id
+                      new_target_type.splice(index, 1)
+                      new_target.target_type = new_target_type
+                      setTarget(new_target)
                       resolve()
                     }, 1000)
                   }),
@@ -456,28 +461,67 @@ export default function CustomTemplate() {
             variant='contained'
             color='primary'
             onClick={async () => {
-              console.log(tables)
-              console.log(target)
-              // dispatch(Action.isLoading(true))
-              // const result = await dispatch(Action.editDefaultRebate(tables))
-              // setTimeout(() => {
-              //   if (result.status === 200) {
-              //     store.addNotification({
-              //       ...notification,
-              //       type: "success",
-              //       title: "Success",
-              //       message: "Update success",
-              //     })
-              //   } else {
-              //     store.addNotification({
-              //       ...notification,
-              //       type: "danger",
-              //       title: "Fail",
-              //       message: result.data.detail,
-              //     })
-              //   }
-              //   dispatch(Action.isLoading(false))
-              // }, 1000)
+              let errorCount = 0
+              if (owner === "") {
+                store.addNotification({
+                  ...notification,
+                  type: "danger",
+                  title: "Name Error",
+                  message: "Name of custom cannot be empty!",
+                  dismiss: {
+                    duration: 0,
+                    click: true,
+                    showIcon: true,
+                  },
+                })
+                errorCount += 1
+              }
+
+              if (endDate < startDate) {
+                store.addNotification({
+                  ...notification,
+                  type: "danger",
+                  title: "Date Error",
+                  message: "End Date cannot be less than Start Date",
+                  dismiss: {
+                    duration: 0,
+                    showIcon: true,
+                    click: true,
+                  },
+                })
+                errorCount += 1
+              }
+              if (errorCount < 1) {
+                dispatch(Action.isLoading(true))
+                const data = {
+                  owner: {
+                    name: owner,
+                    start_date: startDate.format("YYYY/MM/DD"),
+                    end_date: endDate.format("YYYY/MM/DD"),
+                  },
+                  target: target,
+                  rebate: tables,
+                }
+                const result = await dispatch(Action.createCustom(data))
+                setTimeout(() => {
+                  if (result.status === 200) {
+                    store.addNotification({
+                      ...notification,
+                      type: "success",
+                      title: "Success",
+                      message: "Update success",
+                    })
+                  } else {
+                    store.addNotification({
+                      ...notification,
+                      type: "danger",
+                      title: "Fail",
+                      message: result.data.detail,
+                    })
+                  }
+                  dispatch(Action.isLoading(false))
+                }, 1000)
+              }
             }}
           >
             Submit

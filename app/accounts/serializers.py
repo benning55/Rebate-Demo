@@ -147,15 +147,17 @@ class CustomTemplateSerializer(serializers.Serializer):
     rebate = ReadRebateNameSerializer(many=True)
 
 
-class WriteTargetNameSerializer(serializers.Serializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=TargetName.objects.all())
-
-
 class WriteTargetTypeSerializer(serializers.Serializer):
     id = serializers.PrimaryKeyRelatedField(queryset=TargetType.objects.all(), required=False)
     name = serializers.CharField(max_length=255)
     min_rate = serializers.DecimalField(decimal_places=2, max_digits=20)
     max_rate = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+
+
+class WriteTargetNameSerializer(serializers.Serializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=TargetName.objects.all())
+    name = serializers.CharField(allow_blank=True)
+    target_types = WriteTargetTypeSerializer(many=True, required=False)
 
 
 class WriteTargetSerializer(serializers.Serializer):
@@ -174,6 +176,19 @@ class WriteRebateNameSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255)
     owner = serializers.PrimaryKeyRelatedField(queryset=Owner.objects.all(), required=False)
     rebate_type = WriteRebateTypeSerializer(many=True, required=False)
+
+
+class WriteOwnerSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=255)
+    start_date = serializers.DateField(input_formats=["%Y/%m/%d"])
+    end_date = serializers.DateField(input_formats=["%Y/%m/%d"])
+
+
+class WriteCustomSerializer(serializers.Serializer):
+    owner = WriteOwnerSerializer()
+    target = WriteTargetNameSerializer()
+    rebate = WriteRebateNameSerializer(many=True)
+
 
 
 

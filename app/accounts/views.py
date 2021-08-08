@@ -247,3 +247,8 @@ class CustomManage(APIView):
         )
         serializer = serializers.CustomTemplateSerializer(template)
         return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        print(data)
+        return Response({'data': 'success'}, status=status.HTTP_200_OK)

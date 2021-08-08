@@ -89,6 +89,17 @@ export const getCustomTemplate = () => {
   }
 }
 
+export const createCustom = (data) => {
+  return async function (dispatch, getState) {
+    try {
+      const resp = await axios.post(`${ENDPOINT}/custom/`, data)
+      return resp
+    } catch (err) {
+      return err.response
+    }
+  }
+}
+
 export default {
   getDefault,
   editDefault,
@@ -96,5 +107,6 @@ export default {
   getNameColumn,
   editDefaultRebate,
   getCustomTemplate,
+  createCustom,
   isLoading,
 }
