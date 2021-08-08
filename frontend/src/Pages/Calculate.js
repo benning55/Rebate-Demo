@@ -6,28 +6,20 @@ import {
   Button,
   Grid,
   Box,
-  IconButton,
   FormControl,
-  InputAdornment,
-  OutlinedInput,
   TextField,
   InputLabel,
   Select,
   MenuItem,
   Container,
 } from "@material-ui/core"
-import MaterialTable, { MTableToolbar } from "material-table"
+import MaterialTable from "material-table"
 import Action from "../Redux/Actions/Action"
 import { makeStyles } from "@material-ui/core/styles"
 import Loading from "../Components/Loading"
 import { store } from "react-notifications-component"
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever"
-import CheckIcon from "@material-ui/icons/Check"
-import EditIcon from "@material-ui/icons/Edit"
-import ConfirmDialog from "../Components/ConfirmDialog"
 import moment from "moment"
-import { DatePicker, Day, KeyboardDatePicker } from "@material-ui/pickers"
-import useMediaQuery from "@material-ui/core/useMediaQuery"
+import { KeyboardDatePicker } from "@material-ui/pickers"
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -57,7 +49,6 @@ const useStyles = makeStyles((theme) => {
   }
 })
 
-let tmp = ""
 const notification = {
   title: "Wonderful!",
   message: "Configurable",

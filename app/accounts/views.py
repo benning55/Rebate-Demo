@@ -16,6 +16,16 @@ TargetTimeline = namedtuple('Timeline', ('target_name', 'target_type'))
 CustomTemplate = namedtuple('Timeline2', ('target', 'rebate'))
 Range = namedtuple('Range', ['start', 'end'])
 
+def get_all_type_rebate():
+    all_name = dict()
+    owner = get_object_or_404(Owner.objects.all(), name='Default')
+    target_name = get_object_or_404(TargetName.objects.all(), owner=owner)
+    target_type = TargetType.objects.filter(target_name_id=target_name.id)
+    for query in target_type:
+        if query.name not in all_name:
+            all_name[query.name] = query.name
+    return all_name
+
 @api_view(['GET', ])
 @permission_classes([IsAuthenticated, ])
 def get_user(request, *args, **kwargs):
@@ -34,6 +44,48 @@ def get_owner(request, *args, **kwargs):
     owners = owners.exclude(name='Default')
     serializer = serializers.ReadOwnerSerializer(owners, many=True)
     return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+
+@api_view(['GET', ])
+@permission_classes([AllowAny, ])
+def get_test(request, *args, **kwargs):
+    # Create column
+    column = []
+    all_name = dict()
+    owner = get_object_or_404(Owner.objects.all(), name='Default')
+    target_name = get_object_or_404(TargetName.objects.all(), owner=owner)
+    target_type = TargetType.objects.filter(target_name_id=target_name.id).order_by('min_rate')
+    for query in target_type:
+        if query.name not in all_name:
+            all_name[query.name] = query.name
+    print(all_name)
+    rebate_name_column = {
+        "title": 'Rebate Name',
+        "field": 'name',
+        "align": "center",
+    }
+    column.append(rebate_name_column)
+    for target in all_name:
+        obj = {
+            "title": target,
+            "field": target,
+            "align": "center",
+            "type": "numeric",
+            "initialEditValue": 0
+        }
+        column.append(obj)
+
+    # Create row
+    rows = []
+    rebate_names = RebateName.objects.filter(owner=owner)
+    for index, rebate_name in enumerate(rebate_names):
+        obj = dict()
+        for item in RebateType.objects.filter(rebate_name_id=rebate_name.id):
+            obj[item.name] = item.rate
+        obj['name'] = rebate_name.name
+        obj['index'] = index
+        obj['id'] = rebate_name.id
+        rows.append(obj)
+    return Response({'data': {"column": column, "rows": rows}}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET', ])
@@ -151,86 +203,104 @@ class RebateDefaultManage(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, *args, **kwargs):
+        # Create column
+        column = []
+        all_name = dict()
         owner = get_object_or_404(Owner.objects.all(), name='Default')
-        rebate_name = RebateName.objects.filter(owner_id=owner.id).order_by('id')
-        serializer = serializers.ReadRebateNameSerializer(rebate_name, many=True)
-        return Response({'data': serializer.data}, status=status.HTTP_200_OK)
+        target_name = get_object_or_404(TargetName.objects.all(), owner=owner)
+        target_type = TargetType.objects.filter(target_name_id=target_name.id).order_by('min_rate')
+        for query in target_type:
+            if query.name not in all_name:
+                all_name[query.name] = query.name
+        rebate_name_column = {
+            "title": 'Rebate Name',
+            "field": 'name',
+            "align": "center",
+        }
+        column.append(rebate_name_column)
+        for target in all_name:
+            obj = {
+                "title": target,
+                "field": target,
+                "align": "center",
+                "type": "numeric",
+                "initialEditValue": 0
+            }
+            column.append(obj)
+
+        # Create row
+        rows = []
+        rebate_names = RebateName.objects.filter(owner=owner)
+        for index, rebate_name in enumerate(rebate_names):
+            obj = dict()
+            for item in RebateType.objects.filter(rebate_name_id=rebate_name.id):
+                obj[item.name] = item.rate
+            obj['name'] = rebate_name.name
+            obj['index'] = index
+            obj['id'] = rebate_name.id
+            rows.append(obj)
+        return Response({'data': {"column": column, "rows": rows}}, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
         data = request.data
-        serializer = serializers.WriteRebateNameSerializer(data=data, many=True)
-        if serializer.is_valid():
-            try:
-                with transaction.atomic():
-                    og_rebate_name = dict()
-                    owner = get_object_or_404(Owner.objects.all(), name='Default')
-                    for name in RebateName.objects.filter(owner=owner):
-                        if name.id not in og_rebate_name:
-                            og_rebate_name[name.id] = name.id
+        try:
+            with transaction.atomic():
+                owner = get_object_or_404(Owner.objects.all(), name="Default")
 
-                    # check if have rebate name id
-                    for item in serializer.validated_data:
-                        if item.get('id') is not None:
-                            og_rebate_type = dict()
-                            rebate_name = item.get('id')
+                rebate_name_dict = dict()
+                for i in RebateName.objects.filter(owner_id=owner.id):
+                    if i.id not in rebate_name_dict:
+                        rebate_name_dict[i.id] = i.id
 
-                            # add all og rebate_type to dict
-                            for og in RebateType.objects.filter(rebate_name=rebate_name):
-                                if og.id not in og_rebate_type:
-                                    og_rebate_type[og.id] = og.id
+                for item in data:
+                    if item.get('id') is not None:
+                        rebate_name = get_object_or_404(RebateName.objects.all(), pk=item.get('id'))
 
-                            # Create or update rebate_type
-                            for item2 in item.get('rebate_type'):
-                                if item2.get('id') is not None:
-                                    rebate_type = item2.get('id')
-                                    rebate_type.name = item2.get('name', rebate_type.name)
-                                    rebate_type.rate = item2.get('rate', rebate_type.rate)
-                                    rebate_type.rebate_name = rebate_name
-                                    rebate_type.save()
+                        # remove exist id from dict
+                        if item.get('id') in rebate_name_dict:
+                            rebate_name_dict.pop(item.get('id'), None)
 
-                                    # check if it have in og if has remove from og
-                                    if rebate_type.id in og_rebate_type:
-                                        og_rebate_type.pop(rebate_type.id, None)
-                                else:
-                                    RebateType.objects.create(
-                                        name=item2.get('name'),
-                                        rate=item2.get('rate'),
-                                        rebate_name=rebate_name
-                                    )
-                            # Delete og that left out
-                            for id in og_rebate_type:
-                                deleted_target = get_object_or_404(RebateType.objects.all(), pk=id)
-                                deleted_target.delete()
+                        all_target_type = get_all_type_rebate()
+                        for rebate_type in RebateType.objects.filter(rebate_name_id=rebate_name.id):
+                            if rebate_type.name in all_target_type:
+                                all_target_type.pop(rebate_type.name, None)
+                            name = rebate_type.name
+                            rebate_type.rate = item.get(name)
+                            rebate_type.save()
 
-                            # check if it have in og rebate name if has remove from og
-                            if rebate_name.id in og_rebate_name:
-                                og_rebate_name.pop(rebate_name.id, None)
-                        else:
-                            """" Create new rebate_name and type """
-                            owner = get_object_or_404(Owner.objects.all(), name='Default')
-                            rebate_name = RebateName.objects.create(
-                                name=item.get('name'),
-                                owner=owner
+                        for left in all_target_type:
+                            if item.get(left) is None:
+                                RebateType.objects.create(
+                                    rebate_name=rebate_name,
+                                    name=left,
+                                    rate=0
+                                )
+                            else:
+                                RebateType.objects.create(
+                                    rebate_name=rebate_name,
+                                    name=left,
+                                    rate=item.get(left)
+                                )
+                    else:
+                        rebate_name = RebateName.objects.create(
+                            name=item.get('name'),
+                            owner_id=owner.id
+                        )
+                        all_target_type = get_all_type_rebate()
+                        for target_name in all_target_type:
+                            RebateType.objects.create(
+                                name=target_name,
+                                rate=item.get(target_name),
+                                rebate_name=rebate_name
                             )
 
-                            # Create new rebate type:
-                            for item2 in item.get('rebate_type'):
-                                RebateType.objects.create(
-                                    name=item2.get('name'),
-                                    rate=item2.get('rate'),
-                                    rebate_name=rebate_name
-                                )
-
-                    # Delete og_rebate_name that left out
-                    for id in og_rebate_name:
-                        deleted_target = get_object_or_404(RebateName.objects.all(), pk=id)
-                        deleted_target.delete()
-                    return Response({'data': 'success'}, status=status.HTTP_200_OK)
-            except DatabaseError as e:
-                transaction.rollback()
-                return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'detail': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                # Delete the left one
+                for id in rebate_name_dict:
+                    deleted_rebate = get_object_or_404(RebateName.objects.all(), pk=id)
+                    deleted_rebate.delete()
+                return Response({'data': 'success'}, status=status.HTTP_200_OK)
+        except DatabaseError as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomManage(APIView):
@@ -254,13 +324,11 @@ class CustomManage(APIView):
         data = request.data
         serializer = serializers.WriteCustomSerializer(data=data)
         if serializer.is_valid():
-            print(serializer.validated_data)
             try:
                 with transaction.atomic():
-                    all_owner = Owner.objects.all()
                     owner_obj = serializer.validated_data.get('owner')
                     target_obj = serializer.validated_data.get('target')
-                    rebate_list = serializer.validated_data.get('rebate')
+                    rebate_list = data.get('rebate')
 
                     queryset = Owner.objects.filter(name=owner_obj.get('name'))
                     for i in queryset:
@@ -299,16 +367,17 @@ class CustomManage(APIView):
                         )
 
                     # create rebate
-                    for rebate in rebate_list:
+                    for item in rebate_list:
                         rebate_name = RebateName.objects.create(
-                            name=rebate.get('name'),
-                            owner_id=owner.id,
+                            name=item.get('name'),
+                            owner_id=owner.id
                         )
-                        for item in rebate.get('rebate_type'):
+                        all_target_type = get_all_type_rebate()
+                        for target_name in all_target_type:
                             RebateType.objects.create(
-                                rebate_name_id=rebate_name.id,
-                                name=item.get('name'),
-                                rate=item.get('rate')
+                                name=target_name,
+                                rate=item.get(target_name),
+                                rebate_name=rebate_name
                             )
 
                     return Response({'data': 'success'}, status=status.HTTP_200_OK)

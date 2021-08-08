@@ -9,5 +9,6 @@ urlpatterns = [
     path('column/', views.get_column),
     path('owners/', views.get_owner),
     path('calculate/', views.CalculateManage.as_view()),
-    path('custom/', views.CustomManage.as_view())
+    path('custom/', views.CustomManage.as_view()),
+    path('test/', views.get_test)
 ]

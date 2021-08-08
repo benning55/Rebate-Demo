@@ -1,25 +1,12 @@
 import React from "react"
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import {
-  Typography,
-  Button,
-  Grid,
-  Box,
-  IconButton,
-  FormControl,
-  InputAdornment,
-  OutlinedInput,
-} from "@material-ui/core"
+import { Typography, Button, Grid, Box } from "@material-ui/core"
 import MaterialTable, { MTableToolbar } from "material-table"
 import Action from "../Redux/Actions/Action"
 import { makeStyles } from "@material-ui/core/styles"
 import Loading from "../Components/Loading"
 import { store } from "react-notifications-component"
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever"
-import CheckIcon from "@material-ui/icons/Check"
-import EditIcon from "@material-ui/icons/Edit"
-import ConfirmDialog from "../Components/ConfirmDialog"
 
 const useStyles = makeStyles((theme) => {
   return {
@@ -35,7 +22,6 @@ const useStyles = makeStyles((theme) => {
   }
 })
 
-let tmp = ""
 const notification = {
   title: "Wonderful!",
   message: "Configurable",
@@ -55,10 +41,8 @@ export default function RebateDefault() {
   const isLoading = useSelector((state) => state.vcReducers.isLoading)
   const classes = useStyles()
 
-  const [tables, setTables] = useState(null)
-  const [onEdit, setOnEdit] = useState(false)
-  const [deleteDialog, setDeleteDialog] = useState(false)
-  const [deleteIndex, setDeleteIndex] = useState(null)
+  const [column, setColumn] = useState(null)
+  const [rows, setRows] = useState(null)
 
   const [fetchColumn, setFetchColumn] = useState([
     { title: "Name", field: "name", align: "center" },
@@ -80,7 +64,9 @@ export default function RebateDefault() {
   const fetchRebateDefault = async () => {
     const result = await dispatch(Action.getDefaultRebate())
     if (result.status === 200) {
-      setTables(result.data.data)
+      console.log(result.data.data.column)
+      setColumn(result.data.data.column)
+      setRows(result.data.data.rows)
     } else {
       store.addNotification({
         ...notification,
@@ -107,34 +93,6 @@ export default function RebateDefault() {
     }
   }
 
-  const deleteRebate = (index) => {
-    const newTables = [...tables]
-    newTables.splice(index, 1)
-    setTables(newTables)
-  }
-
-  const addBtnClick = () => {
-    const obj = {
-      name: "...Type to Change",
-      rebate_type: [],
-    }
-    setTables([...tables, obj])
-  }
-
-  const onNameChange = (index) => {
-    if (tmp !== "") {
-      const newTables = [...tables]
-      newTables[index].name = tmp
-      setTables(newTables)
-    }
-    tmp = ""
-    setOnEdit(!onEdit)
-  }
-
-  const handleDeleteDialogClose = () => {
-    setDeleteDialog(false)
-  }
-
   return (
     <div>
       <Grid container spacing={3}>
@@ -147,157 +105,67 @@ export default function RebateDefault() {
             <Typography variant='h4' component='h1' color='primary'>
               Default Rebate
             </Typography>
-            <Button
-              variant='contained'
-              color='secondary'
-              size='large'
-              classes={{ label: classes.btnCol }}
-              onClick={addBtnClick}
-            >
-              Add Rebate
-            </Button>
           </Box>
         </Grid>
-        {tables &&
-          tables.map((table, index) => (
-            <Grid item xs={12} key={index}>
-              <MaterialTable
-                title={table.name}
-                columns={fetchColumn}
-                data={table.rebate_type}
-                options={{
-                  paging: false,
-                  addRowPosition: "first",
-                  showTitle: false,
-                }}
-                components={{
-                  Toolbar: (props) => (
-                    <div>
-                      <Box>
-                        <IconButton
-                          aria-label='delete'
-                          className={classes.margin}
-                          onClick={() => {
-                            setDeleteIndex(index)
-                            setDeleteDialog(true)
-                          }}
-                        >
-                          <DeleteForeverIcon
-                            fontSize='large'
-                            style={{ color: "#b71c1c" }}
-                          />
-                        </IconButton>
-                      </Box>
-                      <Box
-                        display='flex'
-                        alignItems='center'
-                        justifyContent='space-between'
-                      >
-                        <div
-                          className={classes.margin}
-                          style={{ display: "flex" }}
-                        >
-                          <FormControl
-                            className={classes.margin}
-                            variant='outlined'
-                          >
-                            <OutlinedInput
-                              disabled={!onEdit}
-                              type='text'
-                              id={`comp-${index}`}
-                              defaultValue={table.name}
-                              onChange={(value) => {
-                                tmp = value.target.value
-                              }}
-                              style={{ color: "black" }}
-                              endAdornment={
-                                onEdit ? (
-                                  <InputAdornment position='end'>
-                                    <IconButton
-                                      onClick={() => onNameChange(index)}
-                                      edge='end'
-                                    >
-                                      <CheckIcon />
-                                    </IconButton>
-                                  </InputAdornment>
-                                ) : (
-                                  false
-                                )
-                              }
-                            />
-                          </FormControl>
-                          {onEdit ? null : (
-                            <IconButton
-                              onClick={() => {
-                                setOnEdit(!onEdit)
-                              }}
-                            >
-                              <EditIcon style={{ color: "black" }} />
-                            </IconButton>
-                          )}
-                        </div>
-                        <MTableToolbar {...props} />
-                      </Box>
-                    </div>
-                  ),
-                }}
-                editable={{
-                  onRowAdd: (newData) =>
-                    new Promise((resolve, reject) => {
-                      setTimeout(() => {
-                        // console.log(newData)
-                        const new_current_table = { ...table } // Get current table
-                        const new_rebate_type = [...table.rebate_type, newData] // add new row to rebate_type
-                        const newTable = [...tables] // copy tables
-                        new_current_table.rebate_type = new_rebate_type // assign current table to change to new rebate_type
-                        newTable[index] = new_current_table // assign new current table to tables object
-                        setTables(newTable) // save
-                        resolve()
-                      }, 1000)
-                    }),
-                  onRowUpdate: (newData, oldData) =>
-                    new Promise((resolve, reject) => {
-                      setTimeout(() => {
-                        const newTable = [...tables]
-                        const new_current_table = { ...table }
-                        const new_rebate_type = [...table.rebate_type]
-                        const position = oldData.tableData.id
-
-                        new_rebate_type[position] = newData
-
-                        new_current_table.rebate_type = new_rebate_type
-                        newTable[index] = new_current_table
-                        setTables(newTable)
-                        resolve()
-                      }, 1000)
-                    }),
-                  onRowDelete: (oldData) =>
-                    new Promise((resolve, reject) => {
-                      setTimeout(() => {
-                        const newTable = [...tables]
-                        const new_current_table = { ...table }
-                        const new_rebate_type = [...table.rebate_type]
-
-                        const position = oldData.tableData.id
-                        new_rebate_type.splice(position, 1)
-
-                        new_current_table.rebate_type = new_rebate_type
-                        newTable[index] = new_current_table
-                        setTables(newTable)
-                        resolve()
-                      }, 1000)
-                    }),
-                }}
-              />
-            </Grid>
-          ))}
+        {column && rows && (
+          <Grid item xs={12}>
+            <MaterialTable
+              title='Default Rebate'
+              columns={column}
+              data={rows}
+              options={{
+                paging: false,
+                addRowPosition: "first",
+                showTitle: false,
+              }}
+              components={{
+                Toolbar: (props) => (
+                  <div>
+                    <MTableToolbar {...props} />
+                  </div>
+                ),
+              }}
+              editable={{
+                onRowAdd: (newData) =>
+                  new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      setRows([...rows, newData])
+                      resolve()
+                    }, 1000)
+                  }),
+                onRowUpdate: (newData, oldData) =>
+                  new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      const dataUpdate = [...rows]
+                      const index = oldData.tableData.id
+                      dataUpdate[index] = newData
+                      setRows([...dataUpdate])
+                      resolve()
+                    }, 1000)
+                  }),
+                onRowDelete: (oldData) =>
+                  new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      const dataDelete = [...rows]
+                      const index = oldData.tableData.id
+                      dataDelete.splice(index, 1)
+                      setRows([...dataDelete])
+                      resolve()
+                    }, 1000)
+                  }),
+              }}
+            />
+          </Grid>
+        )}
         <Grid item xs={12}>
           <Button
             variant='contained'
             color='primary'
             onClick={async () => {
+              console.log(rows)
               dispatch(Action.isLoading(true))
-              const result = await dispatch(Action.editDefaultRebate(tables))
+              const result = await dispatch(Action.editDefaultRebate(rows))
+              console.log(result.status)
               setTimeout(() => {
                 if (result.status === 200) {
                   store.addNotification({
@@ -311,7 +179,7 @@ export default function RebateDefault() {
                     ...notification,
                     type: "danger",
                     title: "Fail",
-                    message: result.data.detail,
+                    message: result.data.detail ?? "Server Error",
                   })
                 }
                 dispatch(Action.isLoading(false))
@@ -322,12 +190,6 @@ export default function RebateDefault() {
           </Button>
         </Grid>
       </Grid>
-      <ConfirmDialog
-        index={deleteIndex}
-        deleteDialogOpen={deleteDialog}
-        handleDeleteDialogClose={handleDeleteDialogClose}
-        deleteConfirm={deleteRebate}
-      />
       <Loading loading={isLoading} />
     </div>
   )

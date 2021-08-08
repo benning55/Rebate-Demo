@@ -196,8 +196,8 @@ class WriteSomeSerializer(serializers.Serializer):
     date = serializers.DateField(input_formats=["%Y/%m/%d"])
     values = WrtieTestSerializer()
 
-
 class WriteCustomSerializer(serializers.Serializer):
     owner = WriteOwnerSerializer()
     target = WriteTargetNameSerializer()
     rebate = WriteRebateNameSerializer(many=True)
+

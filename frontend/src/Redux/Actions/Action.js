@@ -56,6 +56,17 @@ export const getNameColumn = () => {
   }
 }
 
+export const getTest = () => {
+  return async function (dispatch, getState) {
+    try {
+      const resp = await axios.get(`${ENDPOINT}/test/`)
+      return resp
+    } catch (err) {
+      return err.response
+    }
+  }
+}
+
 export const getOwners = () => {
   return async function (dispatch, getState) {
     try {
@@ -132,5 +143,6 @@ export default {
   createCustom,
   getOwners,
   isLoading,
+  getTest,
   getCalculate,
 }

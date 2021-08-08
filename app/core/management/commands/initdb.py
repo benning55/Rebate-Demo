@@ -79,6 +79,18 @@ class Command(BaseCommand):
 
             RebateType.objects.create(
                 rebate_name_id=rebate_name1.id,
+                name='กลาง',
+                rate=300
+            )
+
+            RebateType.objects.create(
+                rebate_name_id=rebate_name2.id,
+                name='กลาง',
+                rate=300
+            )
+
+            RebateType.objects.create(
+                rebate_name_id=rebate_name1.id,
                 name='สูง',
                 rate=400
             )
