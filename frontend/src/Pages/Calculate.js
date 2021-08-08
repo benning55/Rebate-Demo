@@ -245,7 +245,7 @@ export default function Calculate() {
                     }}
                     components={{
                       Toolbar: (props) => (
-                        <Container maxWidth='md'>
+                        <Container maxWidth='md' style={{ padding: "1.5rem" }}>
                           <Typography
                             variant='h4'
                             component='h1'

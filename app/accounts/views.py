@@ -375,11 +375,11 @@ class CalculateManage(APIView):
                                 box += rebate_type.rate
                     rage_obj['rebate'] = rebate_list
                     rage_obj['target'] = query.name
-                    rage_obj['start_date'] = owner.start_date.strftime("%Y/%m/%d")
-                    rage_obj['end_date'] = owner.end_date.strftime("%Y/%m/%d")
+                    rage_obj['start_date'] = owner.start_date.strftime("%d/%m/%Y")
+                    rage_obj['end_date'] = owner.end_date.strftime("%d/%m/%Y")
                     rage_obj["min_rate"] = query.min_rate
                     rage_obj['max_rate'] = query.max_rate
-                    rage_obj['title'] = value
+                    rage_obj['title'] = value.capitalize()
                     info.append(rage_obj)
             # print(info)
             return Response({'data': info}, status=status.HTTP_200_OK)

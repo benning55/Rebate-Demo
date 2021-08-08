@@ -12,6 +12,8 @@ import {
 } from "@material-ui/core"
 import ListIcon from "@material-ui/icons/List"
 import RedeemIcon from "@material-ui/icons/Redeem"
+import ExposureIcon from "@material-ui/icons/Exposure"
+import TrackChangesIcon from "@material-ui/icons/TrackChanges"
 import { useHistory, useLocation } from "react-router-dom"
 import moment from "moment"
 
@@ -57,7 +59,7 @@ export default function Layout({ children }) {
   const menuItems = [
     {
       text: "Default Target",
-      icon: <ListIcon style={{ color: "white" }} />,
+      icon: <TrackChangesIcon style={{ color: "white" }} />,
       path: "/",
     },
     {
@@ -72,7 +74,7 @@ export default function Layout({ children }) {
     },
     {
       text: "Calculate",
-      icon: <RedeemIcon style={{ color: "white" }} />,
+      icon: <ExposureIcon style={{ color: "white" }} />,
       path: "/calculate",
     },
   ]
