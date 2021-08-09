@@ -400,6 +400,9 @@ class CalculateManage(APIView):
         serializer = serializers.WriteSomeSerializer(data=data)
         if serializer.is_valid():
             info = []
+            rows = []
+            compound_value = 0
+            total_amt_list = [0]
             name = serializer.validated_data.get('owner_name')
             date = serializer.validated_data.get('date')
             values = serializer.validated_data.get('values')
@@ -415,9 +418,63 @@ class CalculateManage(APIView):
             target_name = TargetName.objects.get(owner_id=owner.id)
             target_types = TargetType.objects.filter(target_name_id=target_name.id)
 
-            for value in values:
+            # crate column
+            column = [
+                {
+                    "title": "No",
+                    "field": "no",
+                    "align": "center",
+                    "type": "numeric",
+                },
+                {
+                    "title": "Order Name",
+                    "field": "order",
+                    "align": "center",
+                },
+                {
+                    "title": "Order Value",
+                    "field": "order_value",
+                    "align": "center",
+                },
+                {
+                    "title": "Value",
+                    "field": "value",
+                    "align": "center",
+                },
+            ]
+            for item in RebateName.objects.filter(owner_id=owner.id):
+                obj = {
+                    "title": item.name,
+                    "field": item.name,
+                    "align": "center",
+                    "type": "numeric",
+                }
+                column.append(obj)
+            column.append({
+                "title": "Total",
+                "field": "total",
+                "align": "center",
+                "type": "numeric",
+            })
+            column.append({
+                "title": "Total Amt",
+                "field": "total_amt",
+                "align": "center",
+                "type": "numeric",
+            })
+            column.append({
+                "title": "Reserved",
+                "field": "reserved",
+                "align": "center",
+                "type": "numeric",
+            })
+
+            # create row
+            for index, value in enumerate(values):
                 if values[value] is not None:
+                    compound_value += values[value]
                     box = 0
+                    range_obj = dict()
                     rage_obj = dict()
                     query = target_types.filter(min_rate__lte=values[value], max_rate__gte=values[value]).first()
                     # test = target_types.filter(min_rate__lte=values[value], max_rate__gte=values[value])
@@ -431,9 +488,15 @@ class CalculateManage(APIView):
                             continue
                     rage_name = query.name
 
+                    range_obj['no'] = index+1
+                    range_obj['order'] = value
+                    range_obj['order_value'] = compound_value
+                    range_obj['value'] = query.name
                     # find rebate_type to get value
                     rebate_names = RebateName.objects.filter(owner_id=owner.id)
                     rebate_list = []
+                    total = 0
+                    cash_left = 0
                     for rebate_name in rebate_names:
                         for rebate_type in RebateType.objects.filter(rebate_name_id=rebate_name.id):
                             if rebate_type.name == rage_name:
@@ -442,19 +505,42 @@ class CalculateManage(APIView):
                                     "type_name": rebate_type.name,
                                     "value": rebate_type.rate
                                 }
+                                range_obj[rebate_name.name] = rebate_type.rate
+                                total += rebate_type.rate
                                 rebate_list.append(obj)
-                                # print(rebate_name.name)
                                 box += rebate_type.rate
-                    rage_obj['rebate'] = rebate_list
-                    rage_obj['target'] = query.name
-                    rage_obj['start_date'] = owner.start_date.strftime("%d/%m/%Y")
-                    rage_obj['end_date'] = owner.end_date.strftime("%d/%m/%Y")
-                    rage_obj["min_rate"] = query.min_rate
-                    rage_obj['max_rate'] = query.max_rate
-                    rage_obj['title'] = value.capitalize()
-                    info.append(rage_obj)
+
+                    # start real calculate here
+                    range_obj['total'] = total
+                    total_amt = values[value] * total
+                    range_obj['total_amt'] = total_amt
+                    total_amt_list.append(total_amt)
+                    # print(compound_value)
+                    # print(total_amt_list)
+                    compound_total = total*compound_value
+                    # print(compound_total)
+                    sum_total_amt = sum(total_amt_list)
+                    # print(sum_total_amt)
+                    # print(compound_total-sum_total_amt)
+                    range_obj['reserved'] = compound_total-sum_total_amt
+                    range_obj['compound_total'] = compound_total
+                    range_obj['sum_total_amt'] = sum_total_amt
+                    print(range_obj)
+                    rows.append(range_obj)
+                    # rage_obj['rebate'] = rebate_list
+                    # rage_obj['target'] = query.name
+                    # rage_obj['start_date'] = owner.start_date.strftime("%d/%m/%Y")
+                    # rage_obj['end_date'] = owner.end_date.strftime("%d/%m/%Y")
+                    # rage_obj["min_rate"] = query.min_rate
+                    # rage_obj['max_rate'] = query.max_rate
+                    # rage_obj['title'] = value.capitalize()
+                    # info.append(rage_obj)
             # print(info)
-            return Response({'data': info}, status=status.HTTP_200_OK)
+            data = {
+                "column": column,
+                "rows": rows
+            }
+            return Response({'data': "serializer.data"}, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
             return Response({'data': 'success'}, status=status.HTTP_200_OK)

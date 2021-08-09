@@ -306,8 +306,8 @@ export default function Calculate() {
                       title: "Success",
                       message: "Update success",
                     })
-                    console.log(result.data.data)
-                    setResp(result.data.data)
+                    // console.log(result.data.data)
+                    // setResp(result.data.data)
                   } else {
                     store.addNotification({
                       ...notification,
