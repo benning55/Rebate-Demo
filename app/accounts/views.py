@@ -426,26 +426,44 @@ class CalculateManage(APIView):
                     "align": "center",
                     "type": "numeric",
                     "cellStyle": {
-                        "border": '1px solid black',
+                        "border": '1px solid #757575',
                     },
                     "headerStyle": {
-                        "border": '1px solid black',
+                        "border": '1px solid #757575',
                     }
                 },
                 {
                     "title": "Order Name",
                     "field": "order",
                     "align": "center",
+                    "cellStyle": {
+                        "border": '1px solid #757575',
+                    },
+                    "headerStyle": {
+                        "border": '1px solid #757575',
+                    }
                 },
                 {
                     "title": "Order Value",
                     "field": "order_value",
                     "align": "center",
+                    "cellStyle": {
+                        "border": '1px solid #757575',
+                    },
+                    "headerStyle": {
+                        "border": '1px solid #757575',
+                    }
                 },
                 {
                     "title": "Value",
                     "field": "value",
                     "align": "center",
+                    "cellStyle": {
+                        "border": '1px solid #757575',
+                    },
+                    "headerStyle": {
+                        "border": '1px solid #757575',
+                    }
                 },
             ]
             for item in RebateName.objects.filter(owner_id=owner.id):
@@ -454,6 +472,12 @@ class CalculateManage(APIView):
                     "field": item.name,
                     "align": "center",
                     "type": "numeric",
+                    "cellStyle": {
+                        "border": '1px solid #757575',
+                    },
+                    "headerStyle": {
+                        "border": '1px solid #757575',
+                    }
                 }
                 column.append(obj)
             column.append({
@@ -461,18 +485,36 @@ class CalculateManage(APIView):
                 "field": "total",
                 "align": "center",
                 "type": "numeric",
+                "cellStyle": {
+                    "border": '1px solid #757575',
+                },
+                "headerStyle": {
+                    "border": '1px solid #757575',
+                }
             })
             column.append({
                 "title": "Total Amt",
                 "field": "total_amt",
                 "align": "center",
                 "type": "numeric",
+                "cellStyle": {
+                    "border": '1px solid #757575',
+                },
+                "headerStyle": {
+                    "border": '1px solid #757575',
+                }
             })
             column.append({
                 "title": "Left to pay",
                 "field": "left_to_pay",
                 "align": "center",
                 "type": "numeric",
+                "cellStyle": {
+                    "border": '1px solid #757575',
+                },
+                "headerStyle": {
+                    "border": '1px solid #757575',
+                }
             })
 
             # create row

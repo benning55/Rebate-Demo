@@ -13,7 +13,7 @@ import {
   MenuItem,
   Container,
 } from "@material-ui/core"
-import MaterialTable from "material-table"
+import MaterialTable, { MTableToolbar } from "material-table"
 import Action from "../Redux/Actions/Action"
 import { makeStyles } from "@material-ui/core/styles"
 import Loading from "../Components/Loading"
@@ -224,40 +224,20 @@ export default function Calculate() {
                     search: false,
                     toolbar: true,
                     exportButton: true,
-                    rowStyle: {
-                      backgroundColor: "#EEE",
-                    },
                   }}
-                  // components={{
-                  //   Toolbar: (props) => (
-                  //     <Container maxWidth='md' style={{ padding: "1.5rem" }}>
-                  //       <Typography
-                  //         variant='h4'
-                  //         component='h1'
-                  //         color='primary'
-                  //       >
-                  //         {res.title} ({res.target})
-                  //       </Typography>
-                  //       <Box display='flex' justifyContent='space-between'>
-                  //         <Typography
-                  //           variant='h6'
-                  //           component='h3'
-                  //           color='primary'
-                  //         >
-                  //           Range: {res.min_rate} -{" "}
-                  //           {res.max_rate === null ? "♾️" : res.max_rate}
-                  //         </Typography>
-                  //         <Typography
-                  //           variant='h6'
-                  //           component='h3'
-                  //           color='primary'
-                  //         >
-                  //           From: {res.start_date} - {res.end_date}
-                  //         </Typography>
-                  //       </Box>
-                  //     </Container>
-                  //   ),
-                  // }}
+                  components={{
+                    Toolbar: (props) => (
+                      <div
+                        style={{
+                          borderLeft: "1px solid #757575",
+                          borderTop: "1px solid #757575",
+                          borderRight: "1px solid #757575",
+                        }}
+                      >
+                        <MTableToolbar {...props} />
+                      </div>
+                    ),
+                  }}
                 />
               </Grid>
             )}
@@ -302,7 +282,7 @@ export default function Calculate() {
                     })
                     setRespColumn(result.data.data.column)
                     setResp(result.data.data.rows)
-                    console.log(result.data.data.rows)
+                    console.log(result.data.data.column)
                   } else {
                     store.addNotification({
                       ...notification,
