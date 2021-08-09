@@ -222,7 +222,8 @@ export default function Calculate() {
                     paging: false,
                     showTitle: false,
                     search: false,
-                    toolbar: false,
+                    toolbar: true,
+                    exportButton: true,
                     rowStyle: {
                       backgroundColor: "#EEE",
                     },
