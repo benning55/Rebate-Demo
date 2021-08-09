@@ -264,6 +264,21 @@ export default function Calculate() {
                 errorCount += 1
               }
 
+              if (values.order1 === null) {
+                store.addNotification({
+                  ...notification,
+                  type: "danger",
+                  title: "Order1 Error",
+                  message: "Order1 cannot be empty",
+                  dismiss: {
+                    duration: 0,
+                    click: true,
+                    showIcon: true,
+                  },
+                })
+                errorCount += 1
+              }
+
               if (errorCount < 1) {
                 dispatch(Action.isLoading(true))
                 const data = {
