@@ -562,7 +562,10 @@ class CalculateManage(APIView):
                     range_obj['total'] = total
                     total_amt = compound_value * total
                     range_obj['total_amt'] = total_amt
-                    range_obj['left_to_pay'] = abs(total_amt_list[-1]-total_amt)
+                    if index == 0:
+                        range_obj['left_to_pay'] = 0
+                    else:
+                        range_obj['left_to_pay'] = abs(total_amt_list[-1]-total_amt)
                     total_amt_list.append(total_amt)
                     # print(compound_value)
                     # print(total_amt_list)
