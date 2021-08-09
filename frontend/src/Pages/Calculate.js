@@ -71,23 +71,14 @@ export default function Calculate() {
   const [selectedOwner, setSelectedOwner] = useState("")
   const [selectedDate, setSelectedDate] = useState(moment())
   const [values, setValues] = useState({
-    value1: null,
-    value2: null,
-    value3: null,
-    value4: null,
+    order1: null,
+    order2: null,
+    order3: null,
+    order4: null,
   })
 
   const [resp, setResp] = useState(null)
-  const [respColumn, setRespColumn] = useState([
-    { title: "Rebate Name", field: "rebate_name", align: "center" },
-    { title: "Type", field: "type_name", align: "center" },
-    {
-      title: "Value",
-      field: "value",
-      type: "numeric",
-      align: "center",
-    },
-  ])
+  const [respColumn, setRespColumn] = useState(null)
 
   useEffect(() => {
     fetchOwners()
@@ -161,112 +152,114 @@ export default function Calculate() {
             </Box>
           </Typography>
         </Grid>
-        <Grid item xs={3}>
+        <Grid item xs={12}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={3}>
               <TextField
                 required={true}
-                label='Value1'
+                label='Order1'
                 variant='outlined'
                 className={classes.textField}
                 type='number'
-                value={values.value1}
+                value={values.order1}
                 onChange={(value) => {
                   const oldValue = { ...values }
-                  oldValue.value1 = value.target.value
+                  oldValue.order1 = value.target.value
                   setValues(oldValue)
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={3}>
               <TextField
-                label='Value2'
+                label='Order2'
                 variant='outlined'
                 className={classes.textField}
-                value={values.value2}
+                value={values.order2}
                 onChange={(value) => {
                   const oldValue = { ...values }
-                  oldValue.value2 = value.target.value
+                  oldValue.order2 = value.target.value
                   setValues(oldValue)
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={3}>
               <TextField
-                label='Value3'
+                label='Order3'
                 variant='outlined'
                 className={classes.textField}
-                value={values.value3}
+                value={values.order3}
                 onChange={(value) => {
                   const oldValue = { ...values }
-                  oldValue.value3 = value.target.value
+                  oldValue.order3 = value.target.value
                   setValues(oldValue)
                 }}
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={3}>
               <TextField
-                label='Value4'
+                label='Order4'
                 variant='outlined'
                 className={classes.textField}
-                value={values.value4}
+                value={values.order4}
                 onChange={(value) => {
                   const oldValue = { ...values }
-                  oldValue.value4 = value.target.value
+                  oldValue.order4 = value.target.value
                   setValues(oldValue)
                 }}
               />
             </Grid>
           </Grid>
         </Grid>
-        <Grid item xs={9}>
+        <Grid item xs={12}>
           <Grid container spacing={3}>
-            {resp &&
-              resp.map((res, index) => (
-                <Grid item xs={12}>
-                  <MaterialTable
-                    title='dd'
-                    columns={respColumn}
-                    data={res.rebate}
-                    options={{
-                      paging: false,
-                      addRowPosition: "first",
-                      showTitle: false,
-                      search: false,
-                    }}
-                    components={{
-                      Toolbar: (props) => (
-                        <Container maxWidth='md' style={{ padding: "1.5rem" }}>
-                          <Typography
-                            variant='h4'
-                            component='h1'
-                            color='primary'
-                          >
-                            {res.title} ({res.target})
-                          </Typography>
-                          <Box display='flex' justifyContent='space-between'>
-                            <Typography
-                              variant='h6'
-                              component='h3'
-                              color='primary'
-                            >
-                              Range: {res.min_rate} -{" "}
-                              {res.max_rate === null ? "♾️" : res.max_rate}
-                            </Typography>
-                            <Typography
-                              variant='h6'
-                              component='h3'
-                              color='primary'
-                            >
-                              From: {res.start_date} - {res.end_date}
-                            </Typography>
-                          </Box>
-                        </Container>
-                      ),
-                    }}
-                  />
-                </Grid>
-              ))}
+            {respColumn && resp && (
+              <Grid item xs={12}>
+                <MaterialTable
+                  title='dd'
+                  columns={respColumn}
+                  data={resp}
+                  options={{
+                    paging: false,
+                    showTitle: false,
+                    search: false,
+                    toolbar: false,
+                    rowStyle: {
+                      backgroundColor: "#EEE",
+                    },
+                  }}
+                  // components={{
+                  //   Toolbar: (props) => (
+                  //     <Container maxWidth='md' style={{ padding: "1.5rem" }}>
+                  //       <Typography
+                  //         variant='h4'
+                  //         component='h1'
+                  //         color='primary'
+                  //       >
+                  //         {res.title} ({res.target})
+                  //       </Typography>
+                  //       <Box display='flex' justifyContent='space-between'>
+                  //         <Typography
+                  //           variant='h6'
+                  //           component='h3'
+                  //           color='primary'
+                  //         >
+                  //           Range: {res.min_rate} -{" "}
+                  //           {res.max_rate === null ? "♾️" : res.max_rate}
+                  //         </Typography>
+                  //         <Typography
+                  //           variant='h6'
+                  //           component='h3'
+                  //           color='primary'
+                  //         >
+                  //           From: {res.start_date} - {res.end_date}
+                  //         </Typography>
+                  //       </Box>
+                  //     </Container>
+                  //   ),
+                  // }}
+                />
+              </Grid>
+            )}
           </Grid>
         </Grid>
         <Grid item xs={12}>
@@ -306,8 +299,9 @@ export default function Calculate() {
                       title: "Success",
                       message: "Update success",
                     })
-                    // console.log(result.data.data)
-                    // setResp(result.data.data)
+                    setRespColumn(result.data.data.column)
+                    setResp(result.data.data.rows)
+                    console.log(result.data.data.rows)
                   } else {
                     store.addNotification({
                       ...notification,

@@ -425,6 +425,12 @@ class CalculateManage(APIView):
                     "field": "no",
                     "align": "center",
                     "type": "numeric",
+                    "cellStyle": {
+                        "border": '1px solid black',
+                    },
+                    "headerStyle": {
+                        "border": '1px solid black',
+                    }
                 },
                 {
                     "title": "Order Name",
@@ -463,8 +469,8 @@ class CalculateManage(APIView):
                 "type": "numeric",
             })
             column.append({
-                "title": "Reserved",
-                "field": "reserved",
+                "title": "Left to pay",
+                "field": "left_to_pay",
                 "align": "center",
                 "type": "numeric",
             })
@@ -472,17 +478,18 @@ class CalculateManage(APIView):
             # create row
             for index, value in enumerate(values):
                 if values[value] is not None:
+                    # print(values[value])
                     compound_value += values[value]
                     box = 0
                     range_obj = dict()
-                    rage_obj = dict()
-                    query = target_types.filter(min_rate__lte=values[value], max_rate__gte=values[value]).first()
+                    # print(compound_value)
+                    query = target_types.filter(min_rate__lte=compound_value, max_rate__gte=compound_value).first()
                     # test = target_types.filter(min_rate__lte=values[value], max_rate__gte=values[value])
                     # for i in test:
                     #     print(i.min_rate)
                     if query is None:
                         query = target_types.order_by('-min_rate').first()
-                        if values[value] >= query.min_rate:
+                        if compound_value >= query.min_rate:
                             query = query
                         else:
                             continue
@@ -496,7 +503,6 @@ class CalculateManage(APIView):
                     rebate_names = RebateName.objects.filter(owner_id=owner.id)
                     rebate_list = []
                     total = 0
-                    cash_left = 0
                     for rebate_name in rebate_names:
                         for rebate_type in RebateType.objects.filter(rebate_name_id=rebate_name.id):
                             if rebate_type.name == rage_name:
@@ -512,20 +518,21 @@ class CalculateManage(APIView):
 
                     # start real calculate here
                     range_obj['total'] = total
-                    total_amt = values[value] * total
+                    total_amt = compound_value * total
                     range_obj['total_amt'] = total_amt
+                    range_obj['left_to_pay'] = abs(total_amt_list[-1]-total_amt)
                     total_amt_list.append(total_amt)
                     # print(compound_value)
                     # print(total_amt_list)
-                    compound_total = total*compound_value
+                    # compound_total = total*compound_value
                     # print(compound_total)
-                    sum_total_amt = sum(total_amt_list)
+                    # sum_total_amt = sum(total_amt_list)
                     # print(sum_total_amt)
                     # print(compound_total-sum_total_amt)
-                    range_obj['reserved'] = compound_total-sum_total_amt
-                    range_obj['compound_total'] = compound_total
-                    range_obj['sum_total_amt'] = sum_total_amt
-                    print(range_obj)
+                    # range_obj['reserved'] = compound_total-sum_total_amt
+                    # range_obj['compound_total'] = compound_total
+                    # range_obj['sum_total_amt'] = sum_total_amt
+                    # print(range_obj)
                     rows.append(range_obj)
                     # rage_obj['rebate'] = rebate_list
                     # rage_obj['target'] = query.name
@@ -540,7 +547,8 @@ class CalculateManage(APIView):
                 "column": column,
                 "rows": rows
             }
-            return Response({'data': "serializer.data"}, status=status.HTTP_200_OK)
+            # print(column)
+            return Response({'data': data}, status=status.HTTP_200_OK)
         else:
             print(serializer.errors)
             return Response({'data': 'success'}, status=status.HTTP_200_OK)

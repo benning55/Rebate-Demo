@@ -185,10 +185,10 @@ class WriteOwnerSerializer(serializers.Serializer):
 
 
 class WrtieTestSerializer(serializers.Serializer):
-    value1 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
-    value2 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
-    value3 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
-    value4 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+    order1 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+    order2 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+    order3 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
+    order4 = serializers.DecimalField(decimal_places=2, max_digits=20, allow_null=True)
 
 
 class WriteSomeSerializer(serializers.Serializer):
